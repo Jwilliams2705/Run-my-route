@@ -70,6 +70,11 @@ dialog input { width: 100%; border: 2px solid var(--line); border-radius: 12px; 
 dialog p { font-size: 14px } dialog a { color: var(--accent) }
 .row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px }
 .ghost { border: 2px solid var(--line); background: transparent; border-radius: 12px; padding: 8px 14px; font-weight: 700 }
+.seg2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 4px }
+.seg2 button { border: 0; border-radius: 10px; padding: 10px; background: transparent; font-weight: 700; font-size: 14px }
+.seg2 button[aria-pressed="true"] { background: var(--app); color: #fff }
+.note { margin: 0; font-size: 12px; color: var(--muted) }
+.warn { margin: 0; padding: 10px 12px; border-radius: 12px; background: color-mix(in srgb, var(--sun) 22%, var(--card)); border: 1px solid var(--sun); font-size: 13px }
 [hidden] { display: none !important }
 .errbox { overflow-wrap: anywhere; margin: 0; padding: 10px 14px; background: var(--bad); color: #fff; font-size: 13px }
 </style>
@@ -116,13 +121,21 @@ window.addEventListener("error", function (e) {
     <p class="hint ok" id="hint"></p>
   </section>
 
+  <section class="sec">
+    <div class="h"><span>Tipo de ruta</span></div>
+    <div class="seg2" id="mode"><button type="button" data-m="normal" aria-pressed="true">Normal</button><button type="button" data-m="quiet" aria-pressed="false">Más tranquila</button></div>
+    <p class="note" id="modeNote">Busca el terreno que pediste por cualquier calle donde se puede caminar.</p>
+  </section>
+
   <button type="button" class="cta" id="go">Crear mi ruta</button>
   <p class="msg" id="msg" hidden></p>
+  <p class="warn"><b>Antes de salir, revisa tu ruta en el mapa.</b> La app no conoce el tráfico, la seguridad de la zona ni la iluminación.</p>
 
   <section class="sec" id="result" hidden>
     <div class="h"><span>Elige tu ruta</span></div>
     <div class="opts" id="opts"></div>
     <div class="stats" id="stats"></div>
+    <p class="note" id="roads"></p>
     <div class="h"><span>Pediste vs. esta ruta</span></div>
     <div class="sec" id="compare"></div>
     <div class="h"><span>Perfil de elevación</span></div>
@@ -149,7 +162,7 @@ const TYPES = [
   { k: "subida", name: "Subida", desc: "Pendiente de 4% o más" },
   { k: "bajada", name: "Bajada", desc: "Pendiente de −4% o más" },
 ];
-const S = { km: 8, mix: { plano: 70, ondulado: 20, subida: 5, bajada: 5 }, start: null, routes: [], opt: 0, layers: null };
+const S = { km: 8, mix: { plano: 70, ondulado: 20, subida: 5, bajada: 5 }, start: null, routes: [], opt: 0, layers: null, quiet: false };
 const $ = id => document.getElementById(id);
 const C = k => getComputedStyle(document.documentElement).getPropertyValue("--" + k).trim();
 // Clave de OpenRouteService incluida. Se puede cambiar en Configurar.
@@ -207,6 +220,12 @@ document.querySelectorAll("[data-dk]").forEach(b => b.addEventListener("click", 
 $("terr").addEventListener("click", e => { const b = e.target.closest("[data-t]"); if (!b) return; S.mix[b.dataset.t] = Math.min(100, Math.max(0, S.mix[b.dataset.t] + +b.dataset.d)); renderSetup(); });
 $("terr").addEventListener("input", e => { const k = e.target.id.replace("p-", ""); if (!(k in S.mix)) return; const v = parseInt(e.target.value, 10); S.mix[k] = isFinite(v) ? Math.min(100, Math.max(0, v)) : 0; renderSetup(); });
 $("terr").addEventListener("focusout", renderSetup);
+$("mode").addEventListener("click", e => {
+  const b = e.target.closest("[data-m]"); if (!b) return;
+  S.quiet = b.dataset.m === "quiet";
+  $("mode").querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+  $("modeNote").textContent = S.quiet ? "Prefiere banquetas, senderos y parques, evita avenidas grandes y no usa escaleras." : "Busca el terreno que pediste por cualquier calle donde se puede caminar.";
+});
 
 // ---------- Configuración de la clave ----------
 $("openCfg").addEventListener("click", () => { $("key").value = getKey(); $("cfg").showModal(); });
@@ -244,12 +263,17 @@ async function fetchLoop(seed, points, factor) {
   const res = await fetch("https://api.openrouteservice.org/v2/directions/foot-walking/geojson", {
     method: "POST",
     headers: { "Content-Type": "application/json", "Authorization": getKey() },
-    body: JSON.stringify({ coordinates: [[S.start.lng, S.start.lat]], elevation: true, options: { round_trip: { length: Math.round(S.km * 1000 * factor), points, seed } } })
+    body: JSON.stringify({ coordinates: [[S.start.lng, S.start.lat]], elevation: true, extra_info: ["waytype"], options: Object.assign({ round_trip: { length: Math.round(S.km * 1000 * factor), points, seed } }, S.quiet ? { avoid_features: ["steps"], profile_params: { weightings: { quiet: 1, green: 1 } } } : {}) })
   });
   if (!res.ok) { const err = new Error("HTTP " + res.status); err.status = res.status; throw err; }
   const gj = await res.json();
   const f = gj.features[0];
-  return { coords: f.geometry.coordinates, ascent: f.properties.ascent || 0, ...analyze(f.geometry.coordinates) };
+  // Tipo de vía (OpenRouteService): 1-2 = carreteras y avenidas, 4-7 = senderos, ciclovías y banquetas peatonales.
+  const ways = { busy: 0, foot: 0 };
+  ((f.properties.extras && f.properties.extras.waytype && f.properties.extras.waytype.summary) || []).forEach(w => { if (w.value === 1 || w.value === 2) ways.busy += w.amount; if (w.value >= 4 && w.value <= 7) ways.foot += w.amount; });
+  const r = { coords: f.geometry.coordinates, ascent: f.properties.ascent || 0, busy: Math.round(ways.busy), foot: Math.round(ways.foot), ...analyze(f.geometry.coordinates) };
+  r.rank = S.quiet ? r.match - r.busy : r.match;
+  return r;
 }
 function showMsg(text, isErr) { $("msg").hidden = false; $("msg").textContent = text; $("msg").classList.toggle("err", !!isErr); }
 
@@ -267,7 +291,7 @@ $("go").addEventListener("click", async () => {
     showMsg(st === 401 || st === 403 ? "La clave no es válida. Revísala en Configurar." : st === 429 ? "Se alcanzó el límite de consultas. Espera un minuto e intenta de nuevo." : "No se encontraron rutas desde este punto. Prueba moverte a una calle cercana.", true);
     return;
   }
-  S.routes = ok.sort((a, b) => b.match - a.match).slice(0, 3); S.opt = 0;
+  S.routes = ok.sort((a, b) => b.rank - a.rank).slice(0, 3); S.opt = 0;
   $("msg").hidden = true; $("result").hidden = false; renderResult();
 });
 
@@ -300,6 +324,7 @@ function renderResult() {
   $("opts").innerHTML = S.routes.map((r, i) => `<button type="button" class="opt" data-o="${i}" aria-pressed="${i === S.opt}"><small>Opción ${i + 1}</small><b>${r.match}%</b><small>${(r.total / 1000).toFixed(1)} km</small></button>`).join("");
   $("stats").innerHTML = `<div class="stat"><span>Distancia</span><b>${(rt.total / 1000).toFixed(2)} km</b></div><div class="stat"><span>Desnivel +</span><b>${Math.round(rt.ascent)} m</b></div><div class="stat"><span>Tiempo a 6:00</span><b>${fmtTime((rt.total / 1000 + rt.ascent * 8 / 1000) * 6)}</b></div>`;
   $("compare").innerHTML = TYPES.map(t => `<div class="crow" style="--c:var(--${t.k})"><span>${t.name}</span><span class="bar"><i style="width:${rt.real[t.k]}%"></i></span><code>${S.mix[t.k]}% → ${rt.real[t.k]}%</code></div>`).join("");
+  $("roads").textContent = `Avenidas y calles grandes: ${rt.busy}% · Banquetas, senderos y parques: ${rt.foot}%`;
   $("profile").innerHTML = profileSVG(rt);
   drawRoute(rt);
 }
