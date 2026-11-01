@@ -290,7 +290,7 @@ const BIKE_TYPES = ["cycling-regular", "cycling-road", "cycling-mountain"];
 // Clave de OpenRouteService incluida. Se puede cambiar en Ajustes.
 const DEFAULT_KEY = "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjVhNDlkZTY1MWJiYzRlY2JiNzA5MDNkMGU3MWU1NGUwIiwiaCI6Im11cm11cjY0In0=";
 const ORS = "https://api.openrouteservice.org";
-const WLANG = (navigator.language || "es").toLowerCase().indexOf("es") === 0 ? "es" : "en";
+const WLANG = "es";
 
 const $ = id => document.getElementById(id);
 const C = k => getComputedStyle(document.documentElement).getPropertyValue("--" + k).trim();
@@ -545,11 +545,13 @@ async function getJSON(url, ms) {
 }
 function rng(seed) { let s = Math.abs(Math.round(seed)) % 2147483646 + 1; return () => (s = s * 16807 % 2147483647) / 2147483647; }
 // Lugares con artículo de Wikipedia cerca de la salida. Los artículos más largos suelen ser los lugares más conocidos.
-async function findSights(lat, lng, radius) {
-  const g = await getJSON(wapi() + "action=query&list=geosearch&gscoord=" + lat.toFixed(5) + "%7C" + lng.toFixed(5) + "&gsradius=" + Math.round(Math.min(10000, Math.max(1000, radius))) + "&gslimit=100&gsprop=type");
-  let items = ((g.query && g.query.geosearch) || []).filter(i => !i.type || SIGHT_TYPES[i.type]).slice(0, 50);
+const NOT_PLACES = ["distrito", "district", "batalla", "battle", "diócesis", "diocese", "electoral", "municipio", "municipality", "kansas city"];
+async function findSights(lat, lng, radius, lang) {
+  const g = await getJSON(wapi(lang) + "action=query&list=geosearch&gscoord=" + lat.toFixed(5) + "%7C" + lng.toFixed(5) + "&gsradius=" + Math.round(Math.min(10000, Math.max(1000, radius))) + "&gslimit=100&gsprop=type");
+  // Solo lugares que se pueden visitar: sin batallas, distritos, diócesis ni estaciones de radio y TV.
+  let items = ((g.query && g.query.geosearch) || []).filter(i => (i.type ? SIGHT_TYPES[i.type] : lang === "en") && !NOT_PLACES.some(w => i.title.toLowerCase().indexOf(w) >= 0) && !/^X[EH][A-Z]/.test(i.title)).slice(0, 50);
   if (!items.length) return [];
-  const info = await getJSON(wapi() + "action=query&prop=info&pageids=" + items.map(i => i.pageid).join("%7C"));
+  const info = await getJSON(wapi(lang) + "action=query&prop=info&pageids=" + items.map(i => i.pageid).join("%7C"));
   const len = {}; Object.values((info.query && info.query.pages) || {}).forEach(p => len[p.pageid] = p.length || 0);
   items = items.map(i => ({ id: i.pageid, title: i.title, lat: i.lat, lon: i.lon, score: Math.log10(1000 + (len[i.pageid] || 0)) + (i.type === "landmark" ? .3 : 0) })).sort((a, b) => b.score - a.score);
   const out = [];
@@ -607,7 +609,10 @@ async function fetchVia(pick) {
 }
 async function createSightRoutes() {
   showMsg("Buscando lugares interesantes cerca de ti…");
-  const L = S.km * 1000, sights = await findSights(S.start.lat, S.start.lng, L * .45);
+  const L = S.km * 1000;
+  // Primero en español; si hay pocos lugares (fuera de países hispanos), también en inglés.
+  let sights = await findSights(S.start.lat, S.start.lng, L * .45, "es"); S.wlang = "es";
+  if (sights.length < 4) { const en = await findSights(S.start.lat, S.start.lng, L * .45, "en").catch(() => []); if (en.length > sights.length) { sights = en; S.wlang = "en"; } }
   if (!sights.length) return [];
   showMsg("Armando rutas que pasen por lugares como " + shortTitle(sights[0].title) + ". Tarda unos segundos.");
   let factor = bike() ? 1.25 : 1.3, out = [];
