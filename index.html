@@ -160,13 +160,7 @@ const getKey = () => store.get("ors_key") || DEFAULT_KEY;
 // ---------- Mapa y GPS ----------
 $("noMap").remove();
 const map = L.map("map", { zoomControl: false }).setView([25.651, -100.290], 14);
-const osm = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' });
-const carto = L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
-  maxZoom: 19, subdomains: "abcd",
-  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
-}).addTo(map);
-let tileErrors = 0;
-carto.on("tileerror", () => { if (++tileErrors === 3) { map.removeLayer(carto); osm.addTo(map); } });
+L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' }).addTo(map);
 const meIcon = L.divIcon({ className: "", html: '<div style="width:18px;height:18px;border-radius:50%;background:#34d27b;border:3px solid #fff;box-shadow:0 0 0 6px rgba(52,210,123,.3)"></div>', iconSize: [18, 18] });
 let meMarker = null, watchId = null, followGps = true;
 
