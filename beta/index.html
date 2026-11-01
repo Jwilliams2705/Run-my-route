@@ -34,7 +34,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .icon-btn { border: 0; background: rgba(255,255,255,.12); color: #fff; border-radius: 12px; padding: 8px 10px; font-size: 13px; font-weight: 600; white-space: nowrap }
 .banner { margin: 0; padding: 8px max(16px, env(safe-area-inset-right, 0px)) 8px max(16px, env(safe-area-inset-left, 0px)); background: var(--sun); color: #14213d; font-size: 13px; font-weight: 600 }
 #map { height: 44vh; min-height: 280px; background: var(--line) }
-body.running #map { height: 58vh }
+body.running #map { height: calc(100vh - 215px); height: calc(100dvh - 215px) }
 .gps { margin: -22px max(16px, env(safe-area-inset-right, 0px)) 0 max(16px, env(safe-area-inset-left, 0px)); position: relative; z-index: 500; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 10px 12px; box-shadow: 0 8px 20px -10px rgba(20,33,61,.4); font-size: 13px; display: grid; gap: 8px }
 body.running .gps { display: none }
 .gpsrow { display: flex; align-items: center; gap: 10px }
@@ -642,7 +642,7 @@ map.on("dragstart", () => { if (S.run) S.follow = false; });
 $("center").addEventListener("click", () => { S.follow = true; if (S.here) map.setView([S.here.lat, S.here.lng], Math.max(map.getZoom(), 16)); });
 $("pause").addEventListener("click", () => {
   const r = S.run; if (!r) return;
-  if (r.paused) { r.paused = false; r.t0 = Date.now(); r.last = null; $("pause").textContent = "Pausar"; keepAwake(); say("Seguimos."); }
+  if (r.paused) { r.paused = false; r.t0 = Date.now(); r.last = null; r.lastT = 0; $("pause").textContent = "Pausar"; keepAwake(); say("Seguimos."); }
   else { r.acc = runElapsed(); r.paused = true; $("pause").textContent = "Seguir"; say("Pausa."); }
   renderRun();
 });
@@ -654,8 +654,10 @@ function onRunPosition(p) {
   if (S.follow) map.panTo([here[1], here[0]], { animate: true });
   if (acc > 60) return;
   // Distancia recorrida con el GPS (ignora saltos pequeños por ruido).
-  if (r.last) { const step = haversine(r.last, here); if (step >= 4 && step < 200) { r.dist += step; r.last = here; } }
-  else r.last = here;
+  // Si el GPS salta lejos (túnel, sin señal), solo cuenta el tramo si la velocidad es posible corriendo.
+  const now = runElapsed();
+  if (r.last) { const step = haversine(r.last, here), dt = Math.max(1, now - r.lastT); if (step >= 4) { if (step < 200 || step / dt < 8) r.dist += step; r.last = here; r.lastT = now; } }
+  else { r.last = here; r.lastT = now; }
   r.samples.push({ t: runElapsed(), d: r.dist }); if (r.samples.length > 60) r.samples.shift();
   // Avance sobre la ruta: busca el punto de la ruta más cercano, hacia adelante.
   const rt = r.rt, n = rt.coords.length;
