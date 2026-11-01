@@ -152,6 +152,16 @@ dialog .check { display: flex; gap: 8px; align-items: center; font-weight: 600 }
 .badge b { font-size: 13px } .badge small { font-size: 11px; color: var(--muted) }
 .newbadge { margin: 8px 0 0; padding: 10px 12px; border-radius: 12px; background: linear-gradient(90deg, var(--sun), #ff9b3d); color: #14213d; font-weight: 800 }
 .row.wrap { flex-wrap: wrap }
+.wx { background: linear-gradient(135deg, #2f8cff, #6c3bff); color: #fff; border-radius: 18px; padding: 14px; display: grid; gap: 8px; box-shadow: 0 10px 24px -14px rgba(47,140,255,.8) }
+.wx.hot { background: linear-gradient(135deg, #ff9b3d, #ff5a36); box-shadow: 0 10px 24px -14px rgba(255,90,54,.8) }
+.wx.bad { background: linear-gradient(135deg, #3a3f58, #14213d) }
+.wxtop { display: flex; align-items: center; gap: 12px }
+.wxtop .ic { font-size: 38px; line-height: 1 }
+.wxtop b { font-family: var(--f-display); font-size: 42px; line-height: 1 }
+.wxtop small { display: block; opacity: .92; font-size: 13px }
+.wx ul { margin: 0; padding-left: 18px; font-size: 13px; display: grid; gap: 2px }
+.wx p { margin: 0; font-size: 13px }
+.wx button { border: 0; background: rgba(255,255,255,.2); color: #fff; border-radius: 10px; padding: 6px 10px; font-size: 12px; font-weight: 700; margin-left: auto; flex: none }
 [hidden] { display: none !important }
 .errbox { overflow-wrap: anywhere; margin: 0; padding: 10px 14px; background: var(--bad); color: #fff; font-size: 13px }
 </style>
@@ -190,6 +200,7 @@ window.addEventListener("error", function (e) {
 <main id="plan">
   <p class="tip" id="tip" hidden><span data-t="tip"></span> <button type="button" class="linkbtn" id="tipClose" data-t="gotIt"></button></p>
   <p class="challenge" id="challengeBox" hidden></p>
+  <section class="wx" id="wx" hidden></section>
 
   <section class="sec">
     <div class="h"><span data-t="howTitle"></span></div>
@@ -239,6 +250,7 @@ window.addEventListener("error", function (e) {
     <div class="opts" id="opts"></div>
     <div class="stats" id="stats"></div>
     <p class="note" id="roads"></p>
+    <p class="note" id="wxNote" hidden></p>
     <div class="sec" id="sightsBox" hidden>
       <div class="h"><span data-t="sightsTitle"></span></div>
       <ul class="sights" id="sights"></ul>
@@ -360,7 +372,12 @@ const I = {
     b_first: "Primera ruta", b_firstD: "Termina tu primera ruta", b_5k: "5K", b_5kD: "5 km en una salida", b_10k: "10K", b_10kD: "10 km en una salida", b_21k: "Medio maratón", b_21kD: "21.1 km corriendo",
     b_bike40: "Rodador", b_bike40D: "40 km en bici", b_explorer: "Explorador", b_explorerD: "Conoce 10 lugares", b_globe: "Trotamundos", b_globeD: "Sal en 3 ciudades", b_streak: "Constancia", b_streakD: "3 semanas seguidas",
     b_hills: "Rey de las cuestas", b_hillsD: "Sube 200 m en una salida", b_win: "Retador", b_winD: "Gana un reto",
-    cardRoute: "Ruta", cardTime: "Tiempo", cardPace: "Ritmo", cardSpeed: "Velocidad", cardPlaces: "Lugares que conocí"
+    cardRoute: "Ruta", cardTime: "Tiempo", cardPace: "Ritmo", cardSpeed: "Velocidad", cardPlaces: "Lugares que conocí",
+    wxFeels: "Se siente {0}°", wxRain: "Lluvia {0}%", wxWind: "Viento {0} km/h", wxUv: "UV {0}", wxRefresh: "Actualizar",
+    wxStorm: "Hay tormenta eléctrica cerca. Mejor no salgas ahora.", wxRain1: "Probable lluvia: el piso resbala, sobre todo en bajadas y en la pintura de la calle.", wxRainBike: "Probable lluvia: frena antes y evita la pintura y las alcantarillas.",
+    wxHot: "Mucho calor (se siente {0}°): baja el ritmo, busca sombra y lleva agua.", wxWarm: "Hace calor: toma agua antes y durante la ruta.", wxCold: "Hace frío: sal con capas y calienta bien antes de empezar.",
+    wxUvHigh: "Sol muy fuerte (UV {0}): usa bloqueador, gorra y lentes.", wxWindy: "Viento fuerte ({0} km/h): cuidado con las ráfagas.", wxFog: "Hay neblina: usa ropa de colores que se vean.", wxGood: "Buen clima para salir.",
+    wxBest: "Mejor hora para salir hoy: <b>{0}</b> (se siente {1}°, lluvia {2}%).", wxNote: "Clima: {0}°, se siente {1}°.", wxAdj: " Tiempo ajustado +{0}% por el clima.", wxWater: " Agua sugerida: ~{0} ml.", vWx: "Hay {0} grados y se sienten {1}."
   },
   en: {
     myRoutes: "My routes", settings: "Settings", offline: "No internet. You can still open your saved routes in My routes.",
@@ -411,7 +428,12 @@ const I = {
     b_first: "First route", b_firstD: "Finish your first route", b_5k: "5K", b_5kD: "5 km in one outing", b_10k: "10K", b_10kD: "10 km in one outing", b_21k: "Half marathon", b_21kD: "Run 21.1 km",
     b_bike40: "Rider", b_bike40D: "Ride 40 km", b_explorer: "Explorer", b_explorerD: "Discover 10 places", b_globe: "Globetrotter", b_globeD: "Go out in 3 cities", b_streak: "Consistency", b_streakD: "3 weeks in a row",
     b_hills: "Hill king", b_hillsD: "Climb 200 m in one outing", b_win: "Challenger", b_winD: "Win a challenge",
-    cardRoute: "Route", cardTime: "Time", cardPace: "Pace", cardSpeed: "Speed", cardPlaces: "Places I discovered"
+    cardRoute: "Route", cardTime: "Time", cardPace: "Pace", cardSpeed: "Speed", cardPlaces: "Places I discovered",
+    wxFeels: "Feels like {0}°", wxRain: "Rain {0}%", wxWind: "Wind {0} km/h", wxUv: "UV {0}", wxRefresh: "Refresh",
+    wxStorm: "There's a thunderstorm nearby. Better not to go out now.", wxRain1: "Rain likely: the ground gets slippery, especially downhill and on road paint.", wxRainBike: "Rain likely: brake earlier and avoid road paint and drain covers.",
+    wxHot: "Very hot (feels like {0}°): slow down, look for shade and carry water.", wxWarm: "It's warm: drink water before and during the route.", wxCold: "It's cold: wear layers and warm up well before you start.",
+    wxUvHigh: "Very strong sun (UV {0}): use sunscreen, a cap and sunglasses.", wxWindy: "Strong wind ({0} km/h): watch out for gusts.", wxFog: "It's foggy: wear bright, visible clothes.", wxGood: "Good weather to go out.",
+    wxBest: "Best time to go today: <b>{0}</b> (feels like {1}°, rain {2}%).", wxNote: "Weather: {0}°, feels like {1}°.", wxAdj: " Time adjusted +{0}% for the weather.", wxWater: " Suggested water: ~{0} ml.", vWx: "It's {0} degrees and feels like {1}."
   }
 };
 function t(k) { let s = I[LANG][k]; if (s === undefined) s = I.es[k]; if (s === undefined) s = k; for (let i = 1; i < arguments.length; i++) s = s.split("{" + (i - 1) + "}").join(arguments[i]); return s; }
@@ -543,6 +565,7 @@ function setStart(lat, lng, source, label) {
   $("gpsDot").classList.add("on");
   $("gpsTitle").textContent = source === "gps" ? t("fromGps") : label ? t("fromLabel", label) : t("startChosen");
   $("gpsSub").textContent = source === "gps" ? t("tapOrSearch") : t("tapToChange");
+  loadWeather(false);
 }
 
 // ================= GPS =================
@@ -804,8 +827,66 @@ function renderSights() {
   }).join("");
 }
 
+// ================= Clima (Open-Meteo, gratis y sin clave) =================
+const WX = { at: null, data: null };
+function wxKind(c) { return c >= 95 ? "storm" : (c >= 71 && c <= 77) || c === 85 || c === 86 ? "snow" : c >= 51 ? "rain" : c >= 45 ? "fog" : c >= 2 ? "cloud" : "clear"; }
+const WX_ICON = { storm: "⛈️", snow: "❄️", rain: "🌧️", fog: "🌫️", cloud: "⛅", clear: "☀️" };
+async function loadWeather(force) {
+  if (!S.start) return;
+  const p = [S.start.lng, S.start.lat];
+  // Solo vuelve a consultar si cambiaste de zona o pasaron 20 minutos.
+  if (!force && WX.at && haversine(WX.at.p, p) < 3000 && Date.now() - WX.at.t < 1200000) return;
+  WX.at = { p, t: Date.now() };
+  try {
+    const j = await getJSON("https://api.open-meteo.com/v1/forecast?latitude=" + S.start.lat.toFixed(3) + "&longitude=" + S.start.lng.toFixed(3) + "&current=temperature_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,is_day&hourly=apparent_temperature,precipitation_probability,weather_code,uv_index,wind_speed_10m,is_day&forecast_hours=13&timezone=auto", 10000);
+    const h = j.hourly, c = j.current, pr = i => (h.precipitation_probability && h.precipitation_probability[i]) || 0;
+    WX.data = { temp: c.temperature_2m, feels: c.apparent_temperature, code: c.weather_code, wind: c.wind_speed_10m, day: c.is_day, rainNow: c.precipitation || 0, rainProb: Math.max(pr(0), pr(1)), uv: (h.uv_index && h.uv_index[0]) || 0,
+      hours: h.time.map((tm, i) => ({ tm, feels: h.apparent_temperature[i], prob: pr(i), code: h.weather_code[i], uv: (h.uv_index && h.uv_index[i]) || 0, wind: h.wind_speed_10m[i], day: h.is_day[i] })) };
+  } catch (e) { WX.data = null; WX.at = null; }
+  renderWeather();
+  if (S.routes.length && !S.run) renderResult();
+}
+function wxAdvice(d) {
+  const k = wxKind(d.code), a = [];
+  if (k === "storm") a.push(t("wxStorm"));
+  else if (k === "rain" || d.rainNow > 0 || d.rainProb >= 60) a.push(t(bike() ? "wxRainBike" : "wxRain1"));
+  if (d.feels >= 32) a.push(t("wxHot", Math.round(d.feels))); else if (d.feels >= 27) a.push(t("wxWarm"));
+  if (d.feels <= 5) a.push(t("wxCold"));
+  if (d.day && d.uv >= 8) a.push(t("wxUvHigh", Math.round(d.uv)));
+  if (d.wind >= 30) a.push(t("wxWindy", Math.round(d.wind)));
+  if (k === "fog") a.push(t("wxFog"));
+  return a;
+}
+// Qué tan buena es una hora para salir: calor, frío, lluvia, tormenta, sol fuerte, viento y oscuridad.
+function hourScore(h) { return Math.max(0, h.feels - 22) * 2 + Math.max(0, 6 - h.feels) * 2 + h.prob * .4 + (h.code >= 95 ? 100 : 0) + (h.day ? h.uv * 1.5 : 12) + h.wind * (bike() ? .4 : .2); }
+function bestHour(d) {
+  const hs = d.hours || []; if (hs.length < 2) return null;
+  // Solo sugiere horas razonables para salir (de 5 a 21 h).
+  let b = null; hs.slice(1).forEach(h => { const hr = +h.tm.slice(11, 13); if (hr >= 5 && hr <= 21 && (!b || hourScore(h) < hourScore(b))) b = h; });
+  return b && hourScore(hs[0]) - hourScore(b) >= 10 ? b : null;
+}
+// El calor, la lluvia y el viento (en bici) hacen más lento el recorrido.
+function wxFactor() {
+  const d = WX.data; if (!d) return 1;
+  let f = 1 + Math.min(.2, Math.max(0, d.feels - 18) * .008);
+  if (wxKind(d.code) === "rain" || d.rainNow > 0) f += .03;
+  if (bike()) f += Math.min(.15, d.wind / 250);
+  return f;
+}
+function renderWeather() {
+  const d = WX.data, el = $("wx");
+  if (!d) { el.hidden = true; return; }
+  const k = wxKind(d.code), adv = wxAdvice(d), best = bestHour(d);
+  el.className = "wx" + (k === "storm" || k === "rain" || d.rainProb >= 60 ? " bad" : d.feels >= 30 ? " hot" : "");
+  el.hidden = false;
+  el.innerHTML = '<div class="wxtop"><span class="ic">' + (k === "clear" && !d.day ? "🌙" : WX_ICON[k]) + '</span><b>' + Math.round(d.temp) + '°</b><span><small>' + t("wxFeels", Math.round(d.feels)) + '</small><small>' + t("wxRain", d.rainProb) + ' · ' + t("wxWind", Math.round(d.wind)) + (d.day ? ' · ' + t("wxUv", Math.round(d.uv)) : '') + '</small></span><button type="button" id="wxRef">' + t("wxRefresh") + '</button></div>' +
+    '<ul>' + (adv.length ? adv : [t("wxGood")]).map(x => '<li>' + x + '</li>').join("") + '</ul>' + (best ? '<p>' + t("wxBest", best.tm.slice(11, 16), Math.round(best.feels), best.prob) + '</p>' : '');
+}
+$("wx").addEventListener("click", e => { if (e.target.id === "wxRef") loadWeather(true); });
+function wxSpeech() { const d = WX.data; if (!d) return ""; const a = wxAdvice(d); return " " + t("vWx", Math.round(d.temp), Math.round(d.feels)) + (a.length ? " " + a[0] : ""); }
+
 // ================= Resultado =================
-function estMinutes(rt) { return bike() ? (rt.total / 1000 + rt.ascent * 10 / 1000) / S.speed * 60 : (rt.total / 1000 + rt.ascent * 8 / 1000) * S.pace / 60; }
+function estMinutes(rt) { return (bike() ? (rt.total / 1000 + rt.ascent * 10 / 1000) / S.speed * 60 : (rt.total / 1000 + rt.ascent * 8 / 1000) * S.pace / 60) * wxFactor(); }
 function showResult(scroll) {
   $("result").hidden = false;
   renderResult();
@@ -817,6 +898,8 @@ function renderResult() {
   $("more").hidden = !!S.challenge || (S.routes.length < 2 && !rt.seed);
   $("stats").innerHTML = '<div class="stat"><span>' + t("distance") + '</span><b>' + fmtKm(rt.total) + ' km</b></div><div class="stat"><span>' + t("gain") + '</span><b>' + Math.round(rt.ascent) + ' m</b></div><div class="stat"><span>' + t("timeAt", bike() ? S.speed + ' km/h' : fmtPace(S.pace)) + '</span><b>' + fmtDur(estMinutes(rt)) + '</b></div>';
   $("roads").textContent = t("bigRoads", rt.busy) + " · " + t(bike() ? "bikeways" : "footways", rt.foot);
+  const wd = WX.data; $("wxNote").hidden = !wd;
+  if (wd) { const f = Math.round((wxFactor() - 1) * 100), min = estMinutes(rt), ml = Math.round(min * (wd.feels >= 27 ? 12 : wd.feels >= 18 ? 8 : 5) / 50) * 50; $("wxNote").textContent = t("wxNote", Math.round(wd.temp), Math.round(wd.feels)) + (f >= 2 ? t("wxAdj", f) : "") + (min >= 25 ? t("wxWater", ml) : ""); }
   $("compare").innerHTML = TYPES.map(x => '<div class="crow" style="--c:var(--' + x.k + ')"><span>' + x.name + '</span><span class="bar"><i style="width:' + rt.real[x.k] + '%"></i></span><code>' + S.mix[x.k] + '% → ' + rt.real[x.k] + '%</code></div>').join("");
   const hr = new Date().getHours(); $("night").hidden = !(hr >= 19 || hr < 6);
   $("bikeWarn").hidden = !bike(); $("start").textContent = t(bike() ? "startBike" : "startRun");
@@ -1003,7 +1086,7 @@ $("start").addEventListener("click", () => {
   setTimeout(() => map.invalidateSize(), 50);
   S.follow = true; keepAwake();
   if (watchId === null) locate(false);
-  say(t("vStart", metersText(rt.total)), "alert");
+  say(t("vStart", metersText(rt.total)) + wxSpeech(), "alert");
   tick = setInterval(renderRun, 1000); renderRun();
   if (S.here) onRunPosition({ coords: { latitude: S.here.lat, longitude: S.here.lng, accuracy: S.here.acc }, timestamp: Date.now() });
 });
