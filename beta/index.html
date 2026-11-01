@@ -132,6 +132,26 @@ dialog .check { display: flex; gap: 8px; align-items: center; font-weight: 600 }
 .sights b { display: block; font-size: 14px } .sights small { display: block; font-size: 12px; color: var(--muted) }
 .sights a { font-size: 12px; color: var(--accent); font-weight: 700 }
 .sightmark { width: 24px; height: 24px; border-radius: 50%; background: var(--accent); color: #fff; border: 2px solid #fff; font: 700 12px/20px var(--f-body); text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,.3) }
+.modes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px }
+.mcard { border: 2px solid var(--line); background: var(--card); border-radius: 18px; padding: 14px 12px; text-align: left; display: grid; gap: 4px; align-content: start; transition: transform .15s, border-color .15s, box-shadow .15s }
+.mcard svg { width: 34px; height: 34px }
+.mcard b { font-family: var(--f-display); font-size: 21px; text-transform: uppercase; line-height: 1.05 }
+.mcard small { font-size: 12px; color: var(--muted); line-height: 1.35 }
+.mcard[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 10px 24px -12px rgba(255,90,54,.7); transform: translateY(-2px); background: linear-gradient(160deg, color-mix(in srgb, var(--sun) 20%, var(--card)), var(--card)) }
+.mcard[data-m="train"][aria-pressed="true"] { border-color: var(--ondulado); box-shadow: 0 10px 24px -12px rgba(47,140,255,.7); background: linear-gradient(160deg, color-mix(in srgb, var(--ondulado) 16%, var(--card)), var(--card)) }
+.qtoggle { display: flex; gap: 10px; align-items: center; font-weight: 600; font-size: 14px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px }
+.qtoggle input { width: 20px; height: 20px; accent-color: var(--ondulado) }
+.challenge { margin: 0; padding: 12px 14px; border-radius: 14px; background: linear-gradient(90deg, #6c3bff, #ff5a36); color: #fff; font-size: 14px }
+.turn { padding: 10px 12px; border-radius: 12px; background: #fff; color: #14213d; font-weight: 800; font-size: 17px; line-height: 1.25 }
+.ghostbar { padding: 8px 10px; border-radius: 10px; font-weight: 700; font-size: 14px }
+.ghostbar.ahead { background: rgba(52,210,123,.25); color: #8ff0b8 } .ghostbar.behind { background: rgba(232,69,139,.25); color: #ffb0d2 }
+.badges { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 8px }
+.badge { border: 1px solid var(--line); border-radius: 14px; padding: 10px; display: grid; gap: 2px; opacity: .45; filter: grayscale(1) }
+.badge.on { opacity: 1; filter: none; border-color: var(--sun) }
+.badge i { font-style: normal; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: linear-gradient(135deg, var(--sun), var(--accent)); color: #14213d; font: 800 15px var(--f-display) }
+.badge b { font-size: 13px } .badge small { font-size: 11px; color: var(--muted) }
+.newbadge { margin: 8px 0 0; padding: 10px 12px; border-radius: 12px; background: linear-gradient(90deg, var(--sun), #ff9b3d); color: #14213d; font-weight: 800 }
+.row.wrap { flex-wrap: wrap }
 [hidden] { display: none !important }
 .errbox { overflow-wrap: anywhere; margin: 0; padding: 10px 14px; background: var(--bad); color: #fff; font-size: 13px }
 </style>
@@ -151,146 +171,271 @@ window.addEventListener("error", function (e) {
 <body>
 <header class="top">
   <h1>Ruta a <span>Medida</span></h1>
-  <div class="topbtns"><button class="icon-btn" id="openSaved" type="button">Mis rutas</button><button class="icon-btn" id="openCfg" type="button">Ajustes</button></div>
+  <div class="topbtns"><button class="icon-btn" id="openSaved" type="button" data-t="myRoutes"></button><button class="icon-btn" id="openCfg" type="button" data-t="settings"></button></div>
 </header>
-<p class="banner" id="offline" hidden>Sin internet. Puedes abrir tus rutas guardadas en "Mis rutas".</p>
-<div id="map"><p id="noMap" style="margin:0;padding:24px 20px;font-size:15px;line-height:1.5;color:var(--ink)"><b>El mapa no cargó.</b><br>Revisa tu conexión a internet y vuelve a abrir la app.</p></div>
+<p class="banner" id="offline" hidden data-t="offline"></p>
+<div id="map"><p id="noMap" style="margin:0;padding:24px 20px;font-size:15px;line-height:1.5;color:var(--ink)"><b>El mapa no cargó / The map did not load.</b><br>Revisa tu conexión a internet. / Check your internet connection.</p></div>
 <div class="gps">
   <div class="gpsrow">
     <span class="dot" id="gpsDot"></span>
-    <span class="gpstxt"><b id="gpsTitle">Buscando tu ubicación…</b><small id="gpsSub">Permite el acceso a tu ubicación cuando el teléfono lo pida.</small></span>
-    <button type="button" id="locate">Mi ubicación</button>
+    <span class="gpstxt"><b id="gpsTitle" data-t="gpsFinding"></b><small id="gpsSub" data-t="gpsAllow"></small></span>
+    <button type="button" id="locate" data-t="myLocation"></button>
   </div>
   <div class="search">
-    <input id="q" type="search" placeholder="O busca desde dónde sales: parque, calle, colonia" autocomplete="off" aria-label="Buscar punto de salida">
+    <input id="q" type="search" autocomplete="off" data-tp="searchPh" data-ta="searchPh">
     <ul class="qres" id="qres" hidden></ul>
   </div>
 </div>
 
 <main id="plan">
-  <p class="tip" id="tip" hidden><b>Corre y conoce la ciudad.</b> Elige desde dónde sales (tu hotel, por ejemplo), tus kilómetros y tu terreno. La app arma una ruta que pasa por los lugares más interesantes cerca de ti.<button type="button" class="linkbtn" id="tipClose">Entendido</button></p>
+  <p class="tip" id="tip" hidden><span data-t="tip"></span> <button type="button" class="linkbtn" id="tipClose" data-t="gotIt"></button></p>
+  <p class="challenge" id="challengeBox" hidden></p>
 
   <section class="sec">
-    <div class="h"><span>¿Qué vas a hacer?</span></div>
-    <div class="seg2" id="sport"><button type="button" data-s="run" aria-pressed="true">Correr</button><button type="button" data-s="bike" aria-pressed="false">Bici</button></div>
-    <div class="chips" id="bikeType" hidden><button type="button" class="chip" data-b="cycling-regular">Urbana</button><button type="button" class="chip" data-b="cycling-road">Ruta (asfalto)</button><button type="button" class="chip" data-b="cycling-mountain">Montaña</button></div>
+    <div class="h"><span data-t="howTitle"></span></div>
+    <div class="modes" id="mode">
+      <button type="button" class="mcard" data-m="sights" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="#ff5a36" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg><b data-t="mSights"></b><small data-t="mSightsSub"></small></button>
+      <button type="button" class="mcard" data-m="train" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="#2f8cff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6M12 2v3"/></svg><b data-t="mTrain"></b><small data-t="mTrainSub"></small></button>
+    </div>
+    <label class="qtoggle" id="quietWrap" hidden><input type="checkbox" id="quietChk"> <span data-t="quietLbl"></span></label>
+    <p class="note" id="modeNote"></p>
   </section>
 
   <section class="sec">
-    <div class="h"><label for="km">¿Cuántos kilómetros?</label></div>
+    <div class="h"><span data-t="sportTitle"></span></div>
+    <div class="seg2" id="sport"><button type="button" data-s="run" aria-pressed="true" data-t="run"></button><button type="button" data-s="bike" aria-pressed="false" data-t="bike"></button></div>
+    <div class="chips" id="bikeType" hidden><button type="button" class="chip" data-b="cycling-regular" data-t="bikeCity"></button><button type="button" class="chip" data-b="cycling-road" data-t="bikeRoad"></button><button type="button" class="chip" data-b="cycling-mountain" data-t="bikeMtb"></button></div>
+  </section>
+
+  <section class="sec">
+    <div class="h"><label for="km" data-t="kmTitle"></label></div>
     <div class="kmbox">
       <input id="km" type="number" inputmode="decimal" min="0.5" max="100" step="0.1" value="8">
       <small>km</small>
-      <button type="button" class="step" data-dk="-0.5" aria-label="Restar medio kilómetro">−</button>
-      <button type="button" class="step" data-dk="0.5" aria-label="Sumar medio kilómetro">+</button>
+      <button type="button" class="step" data-dk="-0.5" data-ta="kmLess">−</button>
+      <button type="button" class="step" data-dk="0.5" data-ta="kmMore">+</button>
     </div>
     <div class="chips" id="kmChips"></div>
   </section>
 
   <section class="sec">
-    <div class="h"><span>¿Qué terreno quieres?</span><span class="total" id="total">100%</span></div>
+    <div class="h"><span data-t="terrTitle"></span><span class="total" id="total">100%</span></div>
     <div class="chips">
-      <button type="button" class="chip" data-p="100,0,0,0">Todo plano</button>
-      <button type="button" class="chip" data-p="70,20,5,5">Rodaje</button>
-      <button type="button" class="chip" data-p="40,40,10,10">Ondulado</button>
-      <button type="button" class="chip" data-p="20,20,30,30">Cuestas</button>
+      <button type="button" class="chip" data-p="100,0,0,0" data-t="pFlat"></button>
+      <button type="button" class="chip" data-p="70,20,5,5" data-t="pEasy"></button>
+      <button type="button" class="chip" data-p="40,40,10,10" data-t="pRolling"></button>
+      <button type="button" class="chip" data-p="20,20,30,30" data-t="pHills"></button>
     </div>
     <div class="mix" id="mix"></div>
     <div class="sec" id="terr"></div>
     <p class="hint ok" id="hint"></p>
   </section>
 
-  <section class="sec">
-    <div class="h"><span>Tipo de ruta</span></div>
-    <div class="seg2 seg3" id="mode"><button type="button" data-m="sights" aria-pressed="true">Conocer lugares</button><button type="button" data-m="normal" aria-pressed="false">Normal</button><button type="button" data-m="quiet" aria-pressed="false">Más tranquila</button></div>
-    <p class="note" id="modeNote">Pasa por monumentos, museos, plazas y miradores cerca de ti.</p>
-  </section>
-
-  <button type="button" class="cta" id="go">Crear mi ruta</button>
+  <button type="button" class="cta" id="go" data-t="go"></button>
   <p class="msg" id="msg" hidden></p>
 
   <section class="sec" id="result" hidden>
-    <div class="h"><span>Elige tu ruta</span><button type="button" class="linkbtn" id="more">Ver otras rutas</button></div>
+    <div class="h"><span data-t="chooseRoute"></span><button type="button" class="linkbtn" id="more" data-t="moreRoutes"></button></div>
     <div class="opts" id="opts"></div>
     <div class="stats" id="stats"></div>
     <p class="note" id="roads"></p>
     <div class="sec" id="sightsBox" hidden>
-      <div class="h"><span>Lo que vas a ver</span></div>
+      <div class="h"><span data-t="sightsTitle"></span></div>
       <ul class="sights" id="sights"></ul>
-      <p class="note">Descripciones y fotos de Wikipedia.</p>
+      <p class="note" data-t="wikiNote"></p>
     </div>
     <div class="actions">
-      <button type="button" class="cta" id="start">Empezar a correr</button>
-      <div class="act3"><button type="button" class="ghost" id="save">Guardar</button><button type="button" class="ghost" id="share">Compartir</button><button type="button" class="ghost" id="gpx">Reloj (GPX)</button></div>
+      <button type="button" class="cta" id="start"></button>
+      <div class="act3"><button type="button" class="ghost" id="save" data-t="save"></button><button type="button" class="ghost" id="share" data-t="share"></button><button type="button" class="ghost" id="gpx" data-t="gpx"></button></div>
     </div>
-    <p class="warn"><b>Antes de salir, revisa tu ruta en el mapa.</b> La app no conoce el tráfico, la seguridad de la zona ni la iluminación.<span id="night" hidden> Es de noche: prefiere zonas iluminadas y con gente, y avisa a alguien por dónde vas.</span><span id="bikeWarn" hidden> Usa casco y luces, y circula en el mismo sentido que los carros.</span></p>
-    <div class="h"><span>Pediste vs. esta ruta</span></div>
+    <p class="warn"><b data-t="warn1"></b> <span data-t="warn2"></span><span id="night" hidden data-t="night"></span><span id="bikeWarn" hidden data-t="bikeWarn"></span></p>
+    <div class="h"><span data-t="compareTitle"></span></div>
     <div class="sec" id="compare"></div>
-    <div class="h"><span>Perfil de elevación</span></div>
+    <div class="h"><span data-t="profileTitle"></span></div>
     <div id="profile"></div>
-    <p class="proflabel" id="profLabel">Toca o desliza sobre el perfil para ver ese punto en el mapa.</p>
+    <p class="proflabel" id="profLabel"></p>
   </section>
 </main>
 
 <section class="run" id="run" hidden>
-  <p class="offroute" id="offroute" hidden>Te saliste de la ruta. Regresa a la línea de color.</p>
-  <div class="runcue" id="cue">Ve al punto verde para empezar.</div>
+  <p class="offroute" id="offroute" hidden data-t="offroute"></p>
+  <div class="turn" id="turn" hidden></div>
+  <div class="runcue" id="cue"></div>
+  <div class="ghostbar" id="ghost" hidden></div>
   <div class="runstats">
-    <div><span>Llevas</span><b id="rDone">0.00</b></div>
-    <div><span>Faltan</span><b id="rLeft">0.00</b></div>
-    <div><span>Tiempo</span><b id="rTime">0:00</b></div>
-    <div><span id="rPaceL">Ritmo</span><b id="rPace">--</b></div>
+    <div><span data-t="done"></span><b id="rDone">0.00</b></div>
+    <div><span data-t="left"></span><b id="rLeft">0.00</b></div>
+    <div><span data-t="time"></span><b id="rTime">0:00</b></div>
+    <div><span id="rPaceL"></span><b id="rPace">--</b></div>
   </div>
   <div class="runbar"><i id="rBar"></i></div>
-  <div class="runbtns"><button type="button" class="ghost" id="center">Centrar</button><button type="button" class="ghost" id="pause">Pausar</button><button type="button" class="cta" id="finish">Terminar</button></div>
+  <div class="runbtns"><button type="button" class="ghost" id="center" data-t="center"></button><button type="button" class="ghost" id="pause" data-t="pause"></button><button type="button" class="cta" id="finish" data-t="finish"></button></div>
 </section>
 
 <dialog id="cfg">
-  <h2>Ajustes</h2>
-  <label for="paceSel">Tu ritmo en plano</label>
+  <h2 data-t="settings"></h2>
+  <label for="nameIn" data-t="nameLbl"></label>
+  <input id="nameIn" type="text" autocomplete="nickname" maxlength="20">
+  <label for="voiceSel" data-t="voiceLbl"></label>
+  <select id="voiceSel"><option value="full" data-t="voiceFull"></option><option value="alerts" data-t="voiceAlerts"></option><option value="off" data-t="voiceOff"></option></select>
+  <label for="paceSel" data-t="paceLbl"></label>
   <select id="paceSel"></select>
-  <label for="speedSel">Tu velocidad en bici (en plano)</label>
+  <label for="speedSel" data-t="speedLbl"></label>
   <select id="speedSel"></select>
-  <label class="check"><input type="checkbox" id="voiceChk"> Avisos de voz al correr o rodar</label>
-  <label for="key">Clave de rutas (opcional)</label>
-  <input id="key" type="text" autocomplete="off" spellcheck="false" placeholder="La app ya trae una clave incluida">
-  <p class="note">Solo cámbiala si quieres usar tu propia clave de OpenRouteService.</p>
-  <div class="row"><button type="button" class="ghost" id="cfgCancel">Cancelar</button><button type="button" class="cta" style="font-size:16px;padding:8px 16px" id="cfgSave">Guardar</button></div>
+  <label for="key" data-t="keyLbl"></label>
+  <input id="key" type="text" autocomplete="off" spellcheck="false" data-tp="keyPh">
+  <p class="note" data-t="keyNote"></p>
+  <div class="row"><button type="button" class="ghost" id="cfgCancel" data-t="cancel"></button><button type="button" class="cta" style="font-size:16px;padding:8px 16px" id="cfgSave" data-t="save"></button></div>
 </dialog>
 
 <dialog id="saved">
-  <h2>Mis rutas</h2>
+  <h2 data-t="myRoutes"></h2>
   <ul class="list" id="savedList"></ul>
-  <h2 style="margin-top:18px">Mis carreras</h2>
+  <h2 style="margin-top:18px" data-t="myRuns"></h2>
   <ul class="list" id="runsList"></ul>
-  <div class="row"><button type="button" class="ghost" id="savedClose">Cerrar</button></div>
+  <h2 style="margin-top:18px" data-t="badgesTitle"></h2>
+  <div class="badges" id="badges"></div>
+  <div class="row"><button type="button" class="ghost" id="savedClose" data-t="close"></button></div>
 </dialog>
 
 <dialog id="summary">
-  <h2>¡Ruta terminada!</h2>
+  <h2 data-t="sumTitle"></h2>
+  <p class="challenge" id="sumGhost" hidden></p>
   <div class="sum" id="sumBody"></div>
-  <div class="row"><button type="button" class="cta" style="font-size:16px;padding:8px 16px" id="sumClose">Listo</button></div>
+  <div id="sumBadges"></div>
+  <div class="row wrap"><button type="button" class="ghost" id="sumChallenge" data-t="challengeBtn"></button><button type="button" class="ghost" id="sumImage" data-t="shareImage"></button><button type="button" class="cta" style="font-size:16px;padding:8px 16px" id="sumClose" data-t="doneBtn"></button></div>
 </dialog>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
+// ================= Idioma (según el teléfono: español o inglés) =================
+const LANG = (navigator.language || "en").toLowerCase().indexOf("es") === 0 ? "es" : "en";
+const I = {
+  es: {
+    myRoutes: "Mis rutas", settings: "Ajustes", offline: "Sin internet. Puedes abrir tus rutas guardadas en Mis rutas.",
+    gpsFinding: "Buscando tu ubicación…", gpsAllow: "Permite el acceso a tu ubicación cuando el teléfono lo pida.", myLocation: "Mi ubicación",
+    searchPh: "O busca desde dónde sales: hotel, parque, calle", tip: "<b>Corre y conoce la ciudad.</b> Elige desde dónde sales (tu hotel, por ejemplo), tus kilómetros y tu terreno. Nosotros armamos la ruta.", gotIt: "Entendido",
+    howTitle: "¿Cómo quieres tu ruta?", mSights: "Conocer la ciudad", mSightsSub: "Pasa por monumentos, museos y miradores, y la voz te los cuenta.", mTrain: "Solo entrenar", mTrainSub: "Tu distancia y tu terreno exactos, sin desvíos.",
+    quietLbl: "Calles tranquilas (menos avenidas)", sightsNote: "Los lugares definen el camino, así que el terreno puede variar un poco.",
+    trainNoteRun: "Busca el terreno que pediste por cualquier calle donde se puede caminar.", trainNoteBike: "Busca el terreno que pediste por cualquier calle donde se puede ir en bici.",
+    quietNoteRun: "Prefiere banquetas, senderos y parques, evita avenidas grandes y no usa escaleras.", quietNoteBike: "Prefiere ciclovías y calles tranquilas, y evita avenidas grandes.",
+    sportTitle: "¿Qué vas a hacer?", run: "Correr", bike: "Bici", bikeCity: "Urbana", bikeRoad: "Ruta (asfalto)", bikeMtb: "Montaña",
+    kmTitle: "¿Cuántos kilómetros?", kmLess: "Menos kilómetros", kmMore: "Más kilómetros", terrTitle: "¿Qué terreno quieres?",
+    pFlat: "Todo plano", pEasy: "Rodaje", pRolling: "Ondulado", pHills: "Cuestas",
+    tFlat: "Plano", tFlatD: "Pendiente menor a 1.5%", tRoll: "Ondulado", tRollD: "Sube y baja suave, 1.5–4%", tUp: "Subida", tUpD: "Pendiente de 4% o más", tDown: "Bajada", tDownD: "Pendiente de −4% o más",
+    less: "Menos", more: "Más", percent: "Porcentaje",
+    kmRange: "Escribe entre 0.5 y 100 km.", sumOk: "Listo: tu terreno suma 100%.", sumMissing: "Te falta {0}% para llegar a 100%.", sumOver: "Te pasas por {0}%.",
+    go: "Crear mi ruta", busy: "Buscando rutas…", chooseRoute: "Elige tu ruta", moreRoutes: "Ver otras rutas", option: "Opción {0}", place1: "lugar", placeN: "lugares",
+    distance: "Distancia", gain: "Desnivel +", timeAt: "Tiempo a {0}", bigRoads: "Avenidas y calles grandes: {0}%", footways: "Banquetas, senderos y parques: {0}%", bikeways: "Ciclovías y senderos: {0}%",
+    sightsTitle: "Lo que vas a ver", wikiNote: "Descripciones y fotos de Wikipedia.", readMore: "Leer más", startRun: "Empezar a correr", startBike: "Empezar a rodar",
+    save: "Guardar", share: "Compartir", gpx: "Reloj (GPX)", warn1: "Antes de salir, revisa tu ruta en el mapa.", warn2: "La app no conoce el tráfico, la seguridad de la zona ni la iluminación.",
+    night: " Es de noche: prefiere zonas iluminadas y con gente, y avisa a alguien por dónde vas.", bikeWarn: " Usa casco y luces, y circula en el mismo sentido que los carros.",
+    compareTitle: "Pediste vs. esta ruta", profileTitle: "Perfil de elevación", profHint: "Toca o desliza sobre el perfil para ver ese punto en el mapa.", profAt: "km {0} · {1} m de altura · {2}",
+    offroute: "Te saliste de la ruta. Regresa a la línea de color.", done: "Llevas", left: "Faltan", time: "Tiempo", pace: "Ritmo", center: "Centrar", pause: "Pausar", resume: "Seguir", finish: "Terminar",
+    cueStart: "Ve al punto verde para empezar.", cuePaused: "En pausa.", cueNow: "Ahora: <b>{0}</b>", cueNext: " · Próximo: <b>{0} de {1} m</b> en {2} km", cueNoHills: " · Ya no hay subidas ni bajadas.", cuePlace: "<br>Lugar: <b>{0}</b> en {1} km", turnIn: "{0} · {1} m",
+    ghostAhead: "Vas {0} m adelante de {1}", ghostBehind: "Vas {0} m atrás de {1}", ghostEven: "Vas parejo con {0}",
+    nameLbl: "Tu nombre (para los retos)", voiceLbl: "Guía de voz", voiceFull: "Completa: giros, lugares y subidas", voiceAlerts: "Solo avisos: lugares, subidas y kilómetros", voiceOff: "Apagada",
+    paceLbl: "Tu ritmo corriendo en plano", speedLbl: "Tu velocidad en bici en plano", keyLbl: "Clave de rutas (opcional)", keyPh: "La app ya trae una clave incluida", keyNote: "Solo cámbiala si quieres usar tu propia clave de OpenRouteService.", cancel: "Cancelar",
+    paceComp: "competitivo", paceFast: "rápido", paceEasy: "cómodo", paceSoft: "suave", paceNew: "principiante",
+    badgesTitle: "Logros", myRuns: "Mis carreras", close: "Cerrar", open: "Abrir", del: "Borrar", lastRoute: "Última ruta creada", routeOf: "Ruta de {0} km", bikeTag: "Bici · ",
+    noSaved: "Todavía no guardas rutas. Crea una y toca Guardar.", noRuns: "Aquí verás tus carreras terminadas.", runLine: "{0} km en {1}", runPace: " · ritmo {0} /km", runBike: " · en bici · {0} km/h",
+    sumTitle: "¡Ruta terminada!", avgPace: "Ritmo promedio", avgSpeed: "Velocidad promedio", completed: "Ruta completada", placesSeen: "Lugares conocidos",
+    challengeBtn: "Retar a un amigo", shareImage: "Compartir imagen", doneBtn: "Listo", newBadge: "¡Nuevo logro! {0}",
+    beat: "¡Le ganaste a {0} por {1}!", lost: "{0} te ganó por {1}. ¡La próxima!", aFriend: "Un amigo",
+    challengeText: "{0} te reta: {1} km en {2}. ¿Le ganas?", challengeBox: "<b>Reto de {0}:</b> {1} km en {2}. Corre esta ruta y la app te dirá en vivo si vas adelante o atrás.",
+    shareText: "Te comparto mi ruta de {0} km en Ruta a Medida", linkCopied: "Link copiado. Pégalo en WhatsApp o donde quieras.", copyThis: "Copia este link: {0}",
+    noLink: "Esta ruta no se puede compartir con link. Usa el botón Reloj (GPX) para enviar el archivo.", gpxReady: "Archivo GPX listo. Ábrelo en Garmin Connect, Strava o la app de tu reloj.",
+    savedOk: "Ruta guardada en Mis rutas. La puedes abrir aunque no tengas internet.", saveFail: "No se pudo guardar. Tu teléfono no tiene espacio para la app.",
+    fromGps: "Sales desde tu ubicación", fromLabel: "Sales desde: {0}", startChosen: "Punto de salida elegido", tapOrSearch: "Toca el mapa o busca un lugar si quieres salir de otro punto.", tapToChange: "Toca el mapa para cambiarlo.",
+    noGps: "Este navegador no tiene GPS", noPerm: "Sin permiso de ubicación", gpsFail: "No se pudo leer el GPS", searchOrTap: "Busca un lugar o toca el mapa para elegir desde dónde sales.",
+    noPlace: "No encontré ese lugar. Prueba con otro nombre.", searchFail: "No se pudo buscar. Revisa tu conexión.", sharedPoint: "punto de la ruta compartida",
+    needStart: "Activa tu ubicación, busca un lugar o toca el mapa para elegir desde dónde sales.", findingRoutes: "Buscando rutas reales a tu alrededor. Tarda unos segundos.",
+    findingPlaces: "Buscando lugares interesantes cerca de ti…", buildingVia: "Armando rutas que pasen por lugares como {0}. Tarda unos segundos.", noSightsFallback: "No encontré lugares conocidos a esa distancia, así que te armé una ruta para entrenar. ",
+    loadingShared: "Cargando la ruta que te compartieron…", sharedReady: "Esta es la ruta que te compartieron.",
+    errNet: "No hay conexión a internet. Conéctate y vuelve a intentar. Tus rutas guardadas sí funcionan sin internet.", errKey: "La clave de rutas no es válida. Revísala en Ajustes.", errLimit: "Se usaron muchas búsquedas seguidas. Espera un minuto y vuelve a intentar.", errNone: "No se encontraron rutas desde este punto. Prueba moverte a una calle cercana o cambia los kilómetros.",
+    vStart: "Empieza tu ruta de {0}. Ve al punto verde.", vOff: "Te saliste de la ruta. Regresa a la línea de color.", vKm: "Kilómetro {0}. Ritmo {1}.", vKmBike: "Kilómetro {0}. Velocidad {1} kilómetros por hora.",
+    vHill: "En {0}, {1} de {2}.", vPlaceIn: "En {0}: {1}.", vPlaceNow: "Estás pasando por {0}.", vTurn: "En {0}, {1}.", vDone: "Ruta terminada. Excelente trabajo.", vEnd: "Carrera terminada.", vPause: "Pausa.", vResume: "Seguimos.",
+    vGhost: "Vas {0} adelante de {1}.", vGhostB: "Vas {0} atrás de {1}.", meters: "{0} metros", km1: "1 kilómetro", kms: "{0} kilómetros", paceSpeech: "{0} con {1}",
+    nFlat: "plano", nRoll: "ondulado", nUp: "subida", nDown: "bajada",
+    b_first: "Primera ruta", b_firstD: "Termina tu primera ruta", b_5k: "5K", b_5kD: "5 km en una salida", b_10k: "10K", b_10kD: "10 km en una salida", b_21k: "Medio maratón", b_21kD: "21.1 km corriendo",
+    b_bike40: "Rodador", b_bike40D: "40 km en bici", b_explorer: "Explorador", b_explorerD: "Conoce 10 lugares", b_globe: "Trotamundos", b_globeD: "Sal en 3 ciudades", b_streak: "Constancia", b_streakD: "3 semanas seguidas",
+    b_hills: "Rey de las cuestas", b_hillsD: "Sube 200 m en una salida", b_win: "Retador", b_winD: "Gana un reto",
+    cardRoute: "Ruta", cardTime: "Tiempo", cardPace: "Ritmo", cardSpeed: "Velocidad", cardPlaces: "Lugares que conocí"
+  },
+  en: {
+    myRoutes: "My routes", settings: "Settings", offline: "No internet. You can still open your saved routes in My routes.",
+    gpsFinding: "Finding your location…", gpsAllow: "Allow location access when your phone asks.", myLocation: "My location",
+    searchPh: "Or search where you start: hotel, park, street", tip: "<b>Run and discover the city.</b> Choose where you start (your hotel, for example), your distance and your terrain. We build the route.", gotIt: "Got it",
+    howTitle: "How do you want your route?", mSights: "Explore the city", mSightsSub: "Passes landmarks, museums and viewpoints, and the voice tells you about them.", mTrain: "Just train", mTrainSub: "Your exact distance and terrain, no detours.",
+    quietLbl: "Quiet streets (fewer big roads)", sightsNote: "The places shape the route, so the terrain can vary a little.",
+    trainNoteRun: "Finds the terrain you asked for on any street you can walk.", trainNoteBike: "Finds the terrain you asked for on any street you can bike.",
+    quietNoteRun: "Prefers sidewalks, paths and parks, avoids big roads and stairs.", quietNoteBike: "Prefers bike lanes and quiet streets, and avoids big roads.",
+    sportTitle: "What are you doing?", run: "Run", bike: "Bike", bikeCity: "City", bikeRoad: "Road (asphalt)", bikeMtb: "Mountain",
+    kmTitle: "How many kilometers?", kmLess: "Fewer kilometers", kmMore: "More kilometers", terrTitle: "What terrain do you want?",
+    pFlat: "All flat", pEasy: "Easy run", pRolling: "Rolling", pHills: "Hills",
+    tFlat: "Flat", tFlatD: "Grade under 1.5%", tRoll: "Rolling", tRollD: "Gentle ups and downs, 1.5–4%", tUp: "Uphill", tUpD: "Grade of 4% or more", tDown: "Downhill", tDownD: "Grade of −4% or more",
+    less: "Less", more: "More", percent: "Percent",
+    kmRange: "Enter between 0.5 and 100 km.", sumOk: "Ready: your terrain adds up to 100%.", sumMissing: "You need {0}% more to reach 100%.", sumOver: "You are {0}% over.",
+    go: "Create my route", busy: "Finding routes…", chooseRoute: "Choose your route", moreRoutes: "See other routes", option: "Option {0}", place1: "place", placeN: "places",
+    distance: "Distance", gain: "Elevation gain", timeAt: "Time at {0}", bigRoads: "Big roads: {0}%", footways: "Sidewalks, paths and parks: {0}%", bikeways: "Bike lanes and paths: {0}%",
+    sightsTitle: "What you'll see", wikiNote: "Descriptions and photos from Wikipedia.", readMore: "Read more", startRun: "Start running", startBike: "Start riding",
+    save: "Save", share: "Share", gpx: "Watch (GPX)", warn1: "Before you go, check your route on the map.", warn2: "The app doesn't know about traffic, neighborhood safety or lighting.",
+    night: " It's dark out: stick to lit, busy areas and tell someone your route.", bikeWarn: " Wear a helmet and lights, and ride with traffic.",
+    compareTitle: "You asked vs. this route", profileTitle: "Elevation profile", profHint: "Tap or slide on the profile to see that point on the map.", profAt: "km {0} · {1} m elevation · {2}",
+    offroute: "You're off the route. Head back to the colored line.", done: "Done", left: "Left", time: "Time", pace: "Pace", center: "Center", pause: "Pause", resume: "Resume", finish: "Finish",
+    cueStart: "Head to the green dot to start.", cuePaused: "Paused.", cueNow: "Now: <b>{0}</b>", cueNext: " · Next: <b>{0} for {1} m</b> in {2} km", cueNoHills: " · No more climbs or descents.", cuePlace: "<br>Place: <b>{0}</b> in {1} km", turnIn: "{0} · {1} m",
+    ghostAhead: "You're {0} m ahead of {1}", ghostBehind: "You're {0} m behind {1}", ghostEven: "You're even with {0}",
+    nameLbl: "Your name (for challenges)", voiceLbl: "Voice guide", voiceFull: "Full: turns, places and hills", voiceAlerts: "Alerts only: places, hills and kilometers", voiceOff: "Off",
+    paceLbl: "Your running pace on flat ground", speedLbl: "Your bike speed on flat ground", keyLbl: "Routing key (optional)", keyPh: "The app already includes a key", keyNote: "Only change it if you want to use your own OpenRouteService key.", cancel: "Cancel",
+    paceComp: "competitive", paceFast: "fast", paceEasy: "comfortable", paceSoft: "easy", paceNew: "beginner",
+    badgesTitle: "Achievements", myRuns: "My runs", close: "Close", open: "Open", del: "Delete", lastRoute: "Last route created", routeOf: "{0} km route", bikeTag: "Bike · ",
+    noSaved: "No saved routes yet. Create one and tap Save.", noRuns: "Your finished runs will show up here.", runLine: "{0} km in {1}", runPace: " · pace {0} /km", runBike: " · by bike · {0} km/h",
+    sumTitle: "Route complete!", avgPace: "Average pace", avgSpeed: "Average speed", completed: "Route completed", placesSeen: "Places discovered",
+    challengeBtn: "Challenge a friend", shareImage: "Share image", doneBtn: "Done", newBadge: "New achievement! {0}",
+    beat: "You beat {0} by {1}!", lost: "{0} beat you by {1}. Next time!", aFriend: "A friend",
+    challengeText: "{0} challenges you: {1} km in {2}. Can you beat it?", challengeBox: "<b>{0}'s challenge:</b> {1} km in {2}. Run this route and the app will tell you live if you're ahead or behind.",
+    shareText: "Here's my {0} km route on Ruta a Medida", linkCopied: "Link copied. Paste it in WhatsApp or anywhere.", copyThis: "Copy this link: {0}",
+    noLink: "This route can't be shared as a link. Use the Watch (GPX) button to send the file.", gpxReady: "GPX file ready. Open it in Garmin Connect, Strava or your watch app.",
+    savedOk: "Route saved in My routes. You can open it even without internet.", saveFail: "Couldn't save. Your phone has no space left for the app.",
+    fromGps: "Starting from your location", fromLabel: "Starting from: {0}", startChosen: "Starting point chosen", tapOrSearch: "Tap the map or search a place to start somewhere else.", tapToChange: "Tap the map to change it.",
+    noGps: "This browser has no GPS", noPerm: "No location permission", gpsFail: "Couldn't read the GPS", searchOrTap: "Search a place or tap the map to choose where you start.",
+    noPlace: "Couldn't find that place. Try another name.", searchFail: "Search failed. Check your connection.", sharedPoint: "shared route start",
+    needStart: "Turn on your location, search a place or tap the map to choose where you start.", findingRoutes: "Finding real routes around you. This takes a few seconds.",
+    findingPlaces: "Looking for interesting places near you…", buildingVia: "Building routes through places like {0}. This takes a few seconds.", noSightsFallback: "No well-known places at that distance, so here's a training route. ",
+    loadingShared: "Loading the route shared with you…", sharedReady: "This is the route shared with you.",
+    errNet: "No internet connection. Connect and try again. Your saved routes still work offline.", errKey: "The routing key is not valid. Check it in Settings.", errLimit: "Too many searches in a row. Wait a minute and try again.", errNone: "No routes found from this point. Move to a nearby street or change the distance.",
+    vStart: "Starting your route: {0}. Head to the green dot.", vOff: "You're off the route. Head back to the colored line.", vKm: "Kilometer {0}. Pace {1}.", vKmBike: "Kilometer {0}. Speed {1} kilometers per hour.",
+    vHill: "In {0}, {1} for {2}.", vPlaceIn: "In {0}: {1}.", vPlaceNow: "You're passing {0}.", vTurn: "In {0}, {1}.", vDone: "Route complete. Great job.", vEnd: "Workout finished.", vPause: "Paused.", vResume: "Resuming.",
+    vGhost: "You're {0} ahead of {1}.", vGhostB: "You're {0} behind {1}.", meters: "{0} meters", km1: "1 kilometer", kms: "{0} kilometers", paceSpeech: "{0}:{1}",
+    nFlat: "flat", nRoll: "rolling", nUp: "uphill", nDown: "downhill",
+    b_first: "First route", b_firstD: "Finish your first route", b_5k: "5K", b_5kD: "5 km in one outing", b_10k: "10K", b_10kD: "10 km in one outing", b_21k: "Half marathon", b_21kD: "Run 21.1 km",
+    b_bike40: "Rider", b_bike40D: "Ride 40 km", b_explorer: "Explorer", b_explorerD: "Discover 10 places", b_globe: "Globetrotter", b_globeD: "Go out in 3 cities", b_streak: "Consistency", b_streakD: "3 weeks in a row",
+    b_hills: "Hill king", b_hillsD: "Climb 200 m in one outing", b_win: "Challenger", b_winD: "Win a challenge",
+    cardRoute: "Route", cardTime: "Time", cardPace: "Pace", cardSpeed: "Speed", cardPlaces: "Places I discovered"
+  }
+};
+function t(k) { let s = I[LANG][k]; if (s === undefined) s = I.es[k]; if (s === undefined) s = k; for (let i = 1; i < arguments.length; i++) s = s.split("{" + (i - 1) + "}").join(arguments[i]); return s; }
+document.documentElement.lang = LANG;
+document.querySelectorAll("[data-t]").forEach(el => el.innerHTML = t(el.dataset.t));
+document.querySelectorAll("[data-tp]").forEach(el => el.placeholder = t(el.dataset.tp));
+document.querySelectorAll("[data-ta]").forEach(el => el.setAttribute("aria-label", t(el.dataset.ta)));
+
 // ================= Configuración =================
 // Umbrales de pendiente por tramo de 100 m.
 const FLAT = 0.015, STEEP = 0.04, BIN = 100;
 const TYPES = [
-  { k: "plano", name: "Plano", desc: "Pendiente menor a 1.5%" },
-  { k: "ondulado", name: "Ondulado", desc: "Sube y baja suave, 1.5–4%" },
-  { k: "subida", name: "Subida", desc: "Pendiente de 4% o más" },
-  { k: "bajada", name: "Bajada", desc: "Pendiente de −4% o más" },
+  { k: "plano", name: t("tFlat"), desc: t("tFlatD") },
+  { k: "ondulado", name: t("tRoll"), desc: t("tRollD") },
+  { k: "subida", name: t("tUp"), desc: t("tUpD") },
+  { k: "bajada", name: t("tDown"), desc: t("tDownD") },
 ];
-const NAMES = { plano: "plano", ondulado: "ondulado", subida: "subida", bajada: "bajada" };
+const NAMES = { plano: t("nFlat"), ondulado: t("nRoll"), subida: t("nUp"), bajada: t("nDown") };
 const PACES = [240, 270, 300, 330, 360, 390, 420, 480, 540, 600];
 const SPEEDS = [12, 15, 18, 20, 22, 25, 28, 30, 35];
 const BIKE_TYPES = ["cycling-regular", "cycling-road", "cycling-mountain"];
 // Clave de OpenRouteService incluida. Se puede cambiar en Ajustes.
 const DEFAULT_KEY = "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjVhNDlkZTY1MWJiYzRlY2JiNzA5MDNkMGU3MWU1NGUwIiwiaCI6Im11cm11cjY0In0=";
 const ORS = "https://api.openrouteservice.org";
-const WLANG = "es";
 
 const $ = id => document.getElementById(id);
 const C = k => getComputedStyle(document.documentElement).getPropertyValue("--" + k).trim();
@@ -302,12 +447,12 @@ const rawKey = () => { try { return localStorage.getItem("ors_key") || ""; } cat
 const getKey = () => rawKey() || DEFAULT_KEY;
 
 const S = {
-  km: 8, mix: { plano: 70, ondulado: 20, subida: 5, bajada: 5 }, quiet: false, routeMode: "sights", sightInfo: {}, wlang: WLANG,
-  start: null, here: null, routes: [], opt: 0, seedBase: 0,
-  pace: store.get("rm_pace", 360), speed: store.get("rm_speed", 22), sport: store.get("rm_sport", "run"), bikeType: store.get("rm_bike", "cycling-regular"), voice: store.get("rm_voice", true),
+  km: 8, mix: { plano: 70, ondulado: 20, subida: 5, bajada: 5 }, quiet: store.get("rm_quiet", false), routeMode: "sights", sightInfo: {}, wlang: LANG,
+  start: null, here: null, routes: [], opt: 0, seedBase: 0, challenge: null,
+  pace: store.get("rm_pace", 360), speed: store.get("rm_speed", 22), sport: store.get("rm_sport", "run"), bikeType: store.get("rm_bike", "cycling-regular"),
+  voiceMode: store.get("rm_voicemode", store.get("rm_voice", true) ? "full" : "off"), name: store.get("rm_name", ""),
   run: null, follow: true
 };
-
 const bike = () => S.sport === "bike";
 
 // ================= Formato =================
@@ -323,6 +468,7 @@ function fmtPace(secPerKm) {
 }
 function fmtDur(min) { const h = Math.floor(min / 60), m = Math.round(min % 60); return h ? h + " h " + String(m).padStart(2, "0") : m + " min"; }
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+const dateFmt = (d, o) => new Date(d).toLocaleDateString(LANG === "es" ? "es-MX" : "en-US", o);
 
 // ================= Geometría =================
 function haversine(a, b) {
@@ -330,13 +476,13 @@ function haversine(a, b) {
   const x = Math.sin(dLat / 2) ** 2 + Math.cos(a[1] * toR) * Math.cos(b[1] * toR) * Math.sin(dLng / 2) ** 2;
   return 2 * R * Math.asin(Math.sqrt(x));
 }
-// Convierte la línea de la ruta [lng, lat, elev] en tramos de 100 m clasificados por pendiente.
 // Distancia (m) de un punto a un tramo a-b, y en qué parte del tramo cae (t de 0 a 1).
 function project(p, a, b) {
-  const k = Math.cos(a[1] * Math.PI / 180) * 111320, ax = 0, ay = 0, bx = (b[0] - a[0]) * k, by = (b[1] - a[1]) * 110540, px = (p[0] - a[0]) * k, py = (p[1] - a[1]) * 110540;
-  const len2 = bx * bx + by * by, t = len2 ? Math.max(0, Math.min(1, (px * bx + py * by) / len2)) : 0;
-  return { d: Math.hypot(px - t * bx, py - t * by), t };
+  const k = Math.cos(a[1] * Math.PI / 180) * 111320, bx = (b[0] - a[0]) * k, by = (b[1] - a[1]) * 110540, px = (p[0] - a[0]) * k, py = (p[1] - a[1]) * 110540;
+  const len2 = bx * bx + by * by, tt = len2 ? Math.max(0, Math.min(1, (px * bx + py * by) / len2)) : 0;
+  return { d: Math.hypot(px - tt * bx, py - tt * by), t: tt };
 }
+// Convierte la línea de la ruta [lng, lat, elev] en tramos de 100 m clasificados por pendiente.
 function analyze(coords) {
   const cum = [0];
   for (let i = 1; i < coords.length; i++) cum.push(cum[i - 1] + haversine(coords[i - 1], coords[i]));
@@ -350,24 +496,35 @@ function analyze(coords) {
   const bins = [];
   for (let d = 0; d < total; d += BIN) {
     const d2 = Math.min(total, d + BIN), a = at(d), b = at(d2), g = (b.e - a.e) / (d2 - d || 1);
-    const t = g >= STEEP ? "subida" : g <= -STEEP ? "bajada" : Math.abs(g) < FLAT ? "plano" : "ondulado";
-    bins.push({ from: d, to: d2, e0: a.e, e1: b.e, t, a: a.ll, b: b.ll });
+    const ty = g >= STEEP ? "subida" : g <= -STEEP ? "bajada" : Math.abs(g) < FLAT ? "plano" : "ondulado";
+    bins.push({ from: d, to: d2, e0: a.e, e1: b.e, t: ty, a: a.ll, b: b.ll });
   }
   // Tramos seguidos del mismo tipo (para los avisos al correr).
   const segs = [];
   bins.forEach(b => { const l = segs[segs.length - 1]; if (l && l.t === b.t) l.to = b.to; else segs.push({ t: b.t, from: b.from, to: b.to }); });
   const real = { plano: 0, ondulado: 0, subida: 0, bajada: 0 };
   bins.forEach(b => real[b.t] += (b.to - b.from));
-  TYPES.forEach(t => real[t.k] = Math.round(real[t.k] / total * 100));
-  const diff = TYPES.reduce((a, t) => a + Math.abs(real[t.k] - S.mix[t.k]), 0);
+  TYPES.forEach(x => real[x.k] = Math.round(real[x.k] / total * 100));
+  const diff = TYPES.reduce((a, x) => a + Math.abs(real[x.k] - S.mix[x.k]), 0);
   const kmErr = Math.abs(total / 1000 - S.km) / S.km * 100;
   return { total, cum, bins, segs, real, at, match: Math.max(0, Math.round(100 - diff / 2 - kmErr)) };
 }
 function routeFrom(coords, extra) {
-  const r = Object.assign({ coords, ascent: 0, busy: 0, foot: 0 }, extra || {}, analyze(coords));
+  const r = Object.assign({ coords, ascent: 0, busy: 0, foot: 0, steps: [] }, extra || {}, analyze(coords));
   if (!r.ascent) { let up = 0; for (let i = 1; i < coords.length; i++) { const d = (coords[i][2] || 0) - (coords[i - 1][2] || 0); if (d > 0) up += d; } r.ascent = up; }
   r.rank = S.quiet ? r.match - r.busy : r.match;
   return r;
+}
+// Indicaciones giro a giro: dónde empieza cada una sobre la ruta. Sin "sigue derecho", salida ni llegadas.
+function stepsOf(f, cum) {
+  return ((f.properties.segments || []).flatMap(s => s.steps || [])).filter(s => [6, 10, 11].indexOf(s.type) < 0 && s.instruction)
+    .map(s => ({ along: Math.round(cum[s.way_points[0]] || 0), text: s.instruction }));
+}
+function waysOf(f) {
+  // Tipo de vía: 1-2 = carreteras y avenidas, 4-7 = senderos, ciclovías y banquetas peatonales.
+  const w = { busy: 0, foot: 0 };
+  ((f.properties.extras && f.properties.extras.waytype && f.properties.extras.waytype.summary) || []).forEach(x => { if (x.value === 1 || x.value === 2) w.busy += x.amount; if (x.value >= 4 && x.value <= 7) w.foot += x.amount; });
+  return { busy: Math.round(w.busy), foot: Math.round(w.foot) };
 }
 
 // ================= Mapa =================
@@ -375,20 +532,20 @@ $("noMap").remove();
 const map = L.map("map", { zoomControl: false }).setView([25.651, -100.290], 14);
 L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' }).addTo(map);
 const dotIcon = (color, size) => L.divIcon({ className: "", html: '<div style="width:' + size + 'px;height:' + size + 'px;border-radius:50%;background:' + color + ';border:3px solid #fff;box-shadow:0 0 0 5px rgba(20,33,61,.25)"></div>', iconSize: [size, size] });
-let startMarker = null, hereMarker = null, routeLayer = null, cursor = null, trackLine = null;
+let startMarker = null, hereMarker = null, routeLayer = null, cursor = null;
 
 function setStart(lat, lng, source, label) {
   S.start = { lat, lng };
   if (!startMarker) startMarker = L.marker([lat, lng], { icon: dotIcon("#34d27b", 18), zIndexOffset: 500 }).addTo(map); else startMarker.setLatLng([lat, lng]);
   $("gpsDot").classList.add("on");
-  $("gpsTitle").textContent = source === "gps" ? "Sales desde tu ubicación" : label ? "Sales desde: " + label : "Punto de salida elegido";
-  $("gpsSub").textContent = source === "gps" ? "Toca el mapa o busca un lugar si quieres salir de otro punto." : "Toca el mapa para cambiarlo.";
+  $("gpsTitle").textContent = source === "gps" ? t("fromGps") : label ? t("fromLabel", label) : t("startChosen");
+  $("gpsSub").textContent = source === "gps" ? t("tapOrSearch") : t("tapToChange");
 }
 
 // ================= GPS =================
 let watchId = null, gpsFirst = true;
 function locate(recenter) {
-  if (!("geolocation" in navigator)) { $("gpsTitle").textContent = "Este navegador no tiene GPS"; $("gpsSub").textContent = "Busca un lugar o toca el mapa para elegir desde dónde sales."; return; }
+  if (!("geolocation" in navigator)) { $("gpsTitle").textContent = t("noGps"); $("gpsSub").textContent = t("searchOrTap"); return; }
   if (watchId !== null) navigator.geolocation.clearWatch(watchId);
   watchId = navigator.geolocation.watchPosition(p => {
     S.here = { lat: p.coords.latitude, lng: p.coords.longitude, acc: p.coords.accuracy, t: p.timestamp };
@@ -400,8 +557,8 @@ function locate(recenter) {
     if (S.run) onRunPosition(p);
   }, err => {
     if (S.start) return;
-    $("gpsTitle").textContent = err.code === 1 ? "Sin permiso de ubicación" : "No se pudo leer el GPS";
-    $("gpsSub").textContent = "Busca un lugar o toca el mapa para elegir desde dónde sales.";
+    $("gpsTitle").textContent = err.code === 1 ? t("noPerm") : t("gpsFail");
+    $("gpsSub").textContent = t("searchOrTap");
   }, { enableHighAccuracy: true, maximumAge: 5000, timeout: 30000 });
 }
 map.on("click", e => { if (S.run) return; setStart(e.latlng.lat, e.latlng.lng, "manual"); });
@@ -423,11 +580,11 @@ $("q").addEventListener("input", () => {
       const j = await fetch(url).then(r => r.json());
       if (my !== qSeq) return;
       const fs = (j.features || []);
-      $("qres").innerHTML = fs.length ? fs.map((f, i) => '<li><button type="button" data-i="' + i + '">' + esc(f.properties.label) + '</button></li>').join("") : '<li class="note" style="padding:8px 10px">No encontré ese lugar. Prueba con otro nombre.</li>';
+      $("qres").innerHTML = fs.length ? fs.map((f, i) => '<li><button type="button" data-i="' + i + '">' + esc(f.properties.label) + '</button></li>').join("") : '<li class="note" style="padding:8px 10px">' + t("noPlace") + '</li>';
       $("qres")._f = fs;
       $("qres").hidden = false;
     } catch (e) {
-      $("qres").innerHTML = '<li class="note" style="padding:8px 10px">No se pudo buscar. Revisa tu conexión.</li>'; $("qres").hidden = false;
+      $("qres").innerHTML = '<li class="note" style="padding:8px 10px">' + t("searchFail") + '</li>'; $("qres").hidden = false;
     }
   }, 350);
 });
@@ -440,33 +597,36 @@ $("qres").addEventListener("click", e => {
 });
 
 // ================= Formulario =================
-$("terr").innerHTML = TYPES.map(t => '<div class="trow" style="--c:var(--' + t.k + ')"><span class="sw"></span><span><b>' + t.name + '</b><small>' + t.desc + '</small></span>' +
-  '<span class="tctl"><button type="button" data-t="' + t.k + '" data-d="-5" aria-label="Menos ' + t.name + '">−</button><input id="p-' + t.k + '" type="number" min="0" max="100" inputmode="numeric" aria-label="Porcentaje ' + t.name + '"><button type="button" data-t="' + t.k + '" data-d="5" aria-label="Más ' + t.name + '">+</button></span></div>').join("");
-const sum = () => TYPES.reduce((a, t) => a + S.mix[t.k], 0);
+$("terr").innerHTML = TYPES.map(x => '<div class="trow" style="--c:var(--' + x.k + ')"><span class="sw"></span><span><b>' + x.name + '</b><small>' + x.desc + '</small></span>' +
+  '<span class="tctl"><button type="button" data-t="' + x.k + '" data-d="-5" aria-label="' + t("less") + ' ' + x.name + '">−</button><input id="p-' + x.k + '" type="number" min="0" max="100" inputmode="numeric" aria-label="' + t("percent") + ' ' + x.name + '"><button type="button" data-t="' + x.k + '" data-d="5" aria-label="' + t("more") + ' ' + x.name + '">+</button></span></div>').join("");
+const sum = () => TYPES.reduce((a, x) => a + S.mix[x.k], 0);
 function renderSetup() {
-  TYPES.forEach(t => { const el = $("p-" + t.k); if (document.activeElement !== el) el.value = S.mix[t.k]; });
+  TYPES.forEach(x => { const el = $("p-" + x.k); if (document.activeElement !== el) el.value = S.mix[x.k]; });
   if (document.activeElement !== $("km")) $("km").value = S.km;
   const tot = sum(), ok = tot === 100, kmOk = S.km >= 0.5 && S.km <= 100;
   $("total").textContent = tot + "%"; $("total").classList.toggle("ok", ok);
-  $("mix").innerHTML = TYPES.map(t => '<i style="width:' + (S.mix[t.k] / Math.max(100, tot) * 100) + '%;background:var(--' + t.k + ')"></i>').join("");
+  $("mix").innerHTML = TYPES.map(x => '<i style="width:' + (S.mix[x.k] / Math.max(100, tot) * 100) + '%;background:var(--' + x.k + ')"></i>').join("");
   $("hint").classList.toggle("ok", ok && kmOk);
-  $("hint").textContent = !kmOk ? "Escribe entre 0.5 y 100 km." : ok ? "Listo: tu terreno suma 100%." : tot < 100 ? "Te falta " + (100 - tot) + "% para llegar a 100%." : "Te pasas por " + (tot - 100) + "%.";
+  $("hint").textContent = !kmOk ? t("kmRange") : ok ? t("sumOk") : tot < 100 ? t("sumMissing", 100 - tot) : t("sumOver", tot - 100);
   $("go").disabled = !(ok && kmOk) || $("go").dataset.busy === "1";
 }
 $("km").addEventListener("input", e => { const v = parseFloat(String(e.target.value).replace(",", ".")); S.km = isFinite(v) ? Math.round(v * 10) / 10 : 0; renderSetup(); });
 document.querySelectorAll("[data-dk]").forEach(b => b.addEventListener("click", () => { S.km = Math.min(100, Math.max(0.5, Math.round((S.km + +b.dataset.dk * (bike() ? 2 : 1)) * 10) / 10)); renderSetup(); }));
 $("kmChips").addEventListener("click", e => { const b = e.target.closest("[data-km]"); if (b) { S.km = +b.dataset.km; renderSetup(); } });
-document.querySelectorAll("[data-p]").forEach(b => b.addEventListener("click", () => { const v = b.dataset.p.split(",").map(Number); TYPES.forEach((t, i) => S.mix[t.k] = v[i]); renderSetup(); }));
-$("terr").addEventListener("click", e => { const b = e.target.closest("[data-t]"); if (!b) return; S.mix[b.dataset.t] = Math.min(100, Math.max(0, S.mix[b.dataset.t] + +b.dataset.d)); renderSetup(); });
+document.querySelectorAll("[data-p]").forEach(b => b.addEventListener("click", () => { const v = b.dataset.p.split(",").map(Number); TYPES.forEach((x, i) => S.mix[x.k] = v[i]); renderSetup(); }));
+$("terr").addEventListener("click", e => { const b = e.target.closest("[data-d]"); if (!b) return; const k = b.dataset.t; S.mix[k] = Math.min(100, Math.max(0, S.mix[k] + +b.dataset.d)); renderSetup(); });
 $("terr").addEventListener("input", e => { const k = e.target.id.replace("p-", ""); if (!(k in S.mix)) return; const v = parseInt(e.target.value, 10); S.mix[k] = isFinite(v) ? Math.min(100, Math.max(0, v)) : 0; renderSetup(); });
 $("terr").addEventListener("focusout", renderSetup);
 $("km").addEventListener("blur", renderSetup);
+// Conocer la ciudad o solo entrenar (con opción de calles tranquilas).
 function setMode(mode) {
-  S.routeMode = mode; const quiet = S.quiet = mode === "quiet";
-  $("mode").querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x.dataset.m === mode)));
-  $("modeNote").textContent = mode === "sights" ? "Pasa por monumentos, museos, plazas y miradores cerca de ti. Respeta tu terreno lo más posible, pero los lugares mandan." : bike() ? (quiet ? "Prefiere ciclovías y calles tranquilas, y evita avenidas grandes." : "Busca el terreno que pediste por cualquier calle donde se puede ir en bici.") : quiet ? "Prefiere banquetas, senderos y parques, evita avenidas grandes y no usa escaleras." : "Busca el terreno que pediste por cualquier calle donde se puede caminar.";
+  S.routeMode = mode === "sights" ? "sights" : "train";
+  $("mode").querySelectorAll("[data-m]").forEach(x => x.setAttribute("aria-pressed", String(x.dataset.m === S.routeMode)));
+  $("quietWrap").hidden = S.routeMode === "sights"; $("quietChk").checked = S.quiet;
+  $("modeNote").textContent = S.routeMode === "sights" ? t("sightsNote") : S.quiet ? t(bike() ? "quietNoteBike" : "quietNoteRun") : t(bike() ? "trainNoteBike" : "trainNoteRun");
 }
 $("mode").addEventListener("click", e => { const b = e.target.closest("[data-m]"); if (b) setMode(b.dataset.m); });
+$("quietChk").addEventListener("change", () => { S.quiet = $("quietChk").checked; store.set("rm_quiet", S.quiet); setMode("train"); });
 // Correr o bici: cambia el tipo de ruta, los kilómetros sugeridos y cómo se mide el avance.
 function setSport(sport, keepKm) {
   S.sport = sport; store.set("rm_sport", sport);
@@ -480,64 +640,67 @@ function setSport(sport, keepKm) {
 $("sport").addEventListener("click", e => { const b = e.target.closest("[data-s]"); if (b && b.dataset.s !== S.sport) setSport(b.dataset.s); });
 $("bikeType").addEventListener("click", e => { const b = e.target.closest("[data-b]"); if (b) { S.bikeType = b.dataset.b; store.set("rm_bike", S.bikeType); setSport("bike", true); } });
 
-// ================= Rutas reales (OpenRouteService, ida y vuelta) =================
-async function fetchLoop(seed, points, factor) {
-  const opts = { round_trip: { length: Math.round(S.km * 1000 * factor), points, seed } };
-  if (S.quiet && !bike()) { opts.avoid_features = ["steps"]; opts.profile_params = { weightings: { quiet: 1, green: 1 } }; }
+// ================= Rutas reales (OpenRouteService) =================
+const profile = () => bike() ? S.bikeType : "foot-walking";
+async function orsRoute(body) {
   let res;
   try {
-    res = await fetch(ORS + "/v2/directions/" + (bike() ? S.bikeType : "foot-walking") + "/geojson", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": getKey() },
-      body: JSON.stringify({ coordinates: [[S.start.lng, S.start.lat]], elevation: true, extra_info: ["waytype"], options: opts })
+    res = await fetch(ORS + "/v2/directions/" + profile() + "/geojson", {
+      method: "POST", headers: { "Content-Type": "application/json", "Authorization": getKey() },
+      body: JSON.stringify(Object.assign({ elevation: true, extra_info: ["waytype"], instructions: true, language: LANG }, body))
     });
   } catch (e) { const err = new Error("red"); err.status = 0; throw err; }
   if (!res.ok) { const err = new Error("HTTP " + res.status); err.status = res.status; throw err; }
-  const f = (await res.json()).features[0];
-  // Tipo de vía: 1-2 = carreteras y avenidas, 4-7 = senderos, ciclovías y banquetas peatonales.
-  const ways = { busy: 0, foot: 0 };
-  ((f.properties.extras && f.properties.extras.waytype && f.properties.extras.waytype.summary) || []).forEach(w => { if (w.value === 1 || w.value === 2) ways.busy += w.amount; if (w.value >= 4 && w.value <= 7) ways.foot += w.amount; });
-  return routeFrom(f.geometry.coordinates, { ascent: f.properties.ascent || 0, busy: Math.round(ways.busy), foot: Math.round(ways.foot), seed, points, factor });
+  return (await res.json()).features[0];
 }
-function showMsg(text, isErr) { $("msg").hidden = !text; $("msg").textContent = text || ""; $("msg").classList.toggle("err", !!isErr); }
-function errText(st) {
-  if (st === 0) return "No hay conexión a internet. Conéctate y vuelve a intentar. Tus rutas guardadas sí funcionan sin internet.";
-  if (st === 401 || st === 403) return "La clave de rutas no es válida. Revísala en Ajustes.";
-  if (st === 429) return "Se usaron muchas búsquedas seguidas. Espera un minuto y vuelve a intentar.";
-  return "No se encontraron rutas desde este punto. Prueba moverte a una calle cercana o cambia los kilómetros.";
+function routeFromFeature(f, extra) {
+  const r = routeFrom(f.geometry.coordinates, Object.assign({ ascent: f.properties.ascent || 0 }, waysOf(f), extra));
+  r.steps = stepsOf(f, r.cum);
+  return r;
 }
+// Ruta de ida y vuelta (solo entrenar).
+async function fetchLoop(seed, points, factor) {
+  const opts = { round_trip: { length: Math.round(S.km * 1000 * factor), points, seed } };
+  if (S.quiet && !bike()) { opts.avoid_features = ["steps"]; opts.profile_params = { weightings: { quiet: 1, green: 1 } }; }
+  const f = await orsRoute({ coordinates: [[S.start.lng, S.start.lat]], options: opts });
+  return routeFromFeature(f, { seed, points, factor });
+}
+function showMsg(text, isErr) { $("msg").hidden = !text; $("msg").innerHTML = text || ""; $("msg").classList.toggle("err", !!isErr); }
+function errText(st) { return st === 0 ? t("errNet") : st === 401 || st === 403 ? t("errKey") : st === 429 ? t("errLimit") : t("errNone"); }
 async function createRoutes() {
-  if (!S.start) { showMsg("Activa tu ubicación, busca un lugar o toca el mapa para elegir desde dónde sales.", true); return; }
+  if (!S.start) { showMsg(t("needStart"), true); return; }
   const b = S.seedBase;
   // El servicio suele dar rutas más largas de lo pedido, así que pedimos un poco menos.
   const tries = bike() ? [[b + 1, 4, .8], [b + 2, 5, .84], [b + 3, 4, .88], [b + 4, 5, .82], [b + 5, 4, .86], [b + 6, 5, .92]]
     : [[b + 1, 4, .72], [b + 2, 5, .76], [b + 3, 4, .8], [b + 4, 5, .72], [b + 5, 4, .76], [b + 6, 5, .84]];
-  $("go").dataset.busy = "1"; $("go").textContent = "Buscando rutas…"; renderSetup();
+  $("go").dataset.busy = "1"; $("go").textContent = t("busy"); renderSetup();
   let ok = [], note = "", results = [];
   if (S.routeMode === "sights") {
     try { ok = await createSightRoutes(); } catch (e) { ok = []; }
-    if (!ok.length) note = "No encontré lugares conocidos a esa distancia, así que te armé una ruta normal. ";
+    if (!ok.length) note = t("noSightsFallback");
   }
   if (!ok.length) {
-    showMsg(note + "Buscando rutas reales a tu alrededor. Tarda unos segundos.");
+    showMsg(note + t("findingRoutes"));
     results = await Promise.allSettled(tries.map(([s, p, f]) => fetchLoop(s, p, f)));
     ok = results.filter(r => r.status === "fulfilled").map(r => r.value);
   }
-  $("go").dataset.busy = ""; $("go").textContent = "Crear mi ruta"; renderSetup();
+  $("go").dataset.busy = ""; $("go").textContent = t("go"); renderSetup();
   if (!ok.length) { const st = results.length && results[0].reason ? results[0].reason.status : 0; showMsg(errText(st), true); return; }
   showMsg(note);
+  S.challenge = null; $("challengeBox").hidden = true;
   S.routes = ok.sort((x, y) => y.rank - x.rank).slice(0, 3); S.opt = 0;
   showResult(true);
   await loadSightInfo();
-  store.set("rm_last", packRoute(S.routes[0], "Última ruta creada"));
+  store.set("rm_last", packRoute(S.routes[0], t("lastRoute")));
 }
 $("go").addEventListener("click", () => { S.seedBase = 0; createRoutes(); });
 $("more").addEventListener("click", () => { S.seedBase += 10; createRoutes(); });
 
 // ================= Lugares para conocer (Wikipedia) =================
 const SIGHT_TYPES = { landmark: 1, mountain: 1, waterbody: 1, forest: 1, glacier: 1, isle: 1, river: 1 };
+const NOT_PLACES = ["distrito", "district", "batalla", "battle", "diócesis", "diocese", "electoral", "municipio", "municipality", "kansas city"];
 const wapi = lang => "https://" + (lang || S.wlang) + ".wikipedia.org/w/api.php?format=json&origin=*&";
-const shortTitle = t => String(t).split(" (")[0];
+const shortTitle = x => String(x).split(" (")[0];
 async function getJSON(url, ms) {
   const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), ms || 15000);
   try { const r = await fetch(url, { signal: ctl.signal }); if (!r.ok) throw new Error("HTTP " + r.status); return await r.json(); }
@@ -545,7 +708,6 @@ async function getJSON(url, ms) {
 }
 function rng(seed) { let s = Math.abs(Math.round(seed)) % 2147483646 + 1; return () => (s = s * 16807 % 2147483647) / 2147483647; }
 // Lugares con artículo de Wikipedia cerca de la salida. Los artículos más largos suelen ser los lugares más conocidos.
-const NOT_PLACES = ["distrito", "district", "batalla", "battle", "diócesis", "diocese", "electoral", "municipio", "municipality", "kansas city"];
 async function findSights(lat, lng, radius, lang) {
   const g = await getJSON(wapi(lang) + "action=query&list=geosearch&gscoord=" + lat.toFixed(5) + "%7C" + lng.toFixed(5) + "&gsradius=" + Math.round(Math.min(10000, Math.max(1000, radius))) + "&gslimit=100&gsprop=type");
   // Solo lugares que se pueden visitar: sin batallas, distritos, diócesis ni estaciones de radio y TV.
@@ -565,7 +727,7 @@ function pickLoops(sights, L, factor, avoid) {
   const ang = s => Math.atan2(s.lat - st.lat, (s.lon - st.lng) * Math.cos(st.lat * Math.PI / 180));
   const perim = set => { let p = 0, prev = s0; set.forEach(s => { const c = [s.lon, s.lat]; p += haversine(prev, c); prev = c; }); return p + haversine(prev, s0); };
   const n = sights.length, seen = {}, cands = [];
-  for (let t = 0; t < 600 && n; t++) {
+  for (let k0 = 0; k0 < 600 && n; k0++) {
     const k = 1 + Math.floor(rnd() * Math.min(4, n)), set = [];
     while (set.length < k) { const s = sights[Math.floor(rnd() * n)]; if (set.indexOf(s) < 0) set.push(s); }
     // En orden alrededor de la salida, para que la vuelta no se cruce.
@@ -590,31 +752,20 @@ function placeSights(r, set) {
 }
 async function fetchVia(pick) {
   const s0 = [S.start.lng, S.start.lat];
-  let res;
-  try {
-    res = await fetch(ORS + "/v2/directions/" + (bike() ? S.bikeType : "foot-walking") + "/geojson", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": getKey() },
-      body: JSON.stringify({ coordinates: [s0].concat(pick.set.map(s => [s.lon, s.lat]), [s0]), elevation: true, extra_info: ["waytype"] })
-    });
-  } catch (e) { const err = new Error("red"); err.status = 0; throw err; }
-  if (!res.ok) { const err = new Error("HTTP " + res.status); err.status = res.status; throw err; }
-  const f = (await res.json()).features[0];
-  const ways = { busy: 0, foot: 0 };
-  ((f.properties.extras && f.properties.extras.waytype && f.properties.extras.waytype.summary) || []).forEach(w => { if (w.value === 1 || w.value === 2) ways.busy += w.amount; if (w.value >= 4 && w.value <= 7) ways.foot += w.amount; });
-  const r = routeFrom(f.geometry.coordinates, { ascent: f.properties.ascent || 0, busy: Math.round(ways.busy), foot: Math.round(ways.foot), straight: pick.perim });
+  const f = await orsRoute({ coordinates: [s0].concat(pick.set.map(s => [s.lon, s.lat]), [s0]) });
+  const r = routeFromFeature(f, { straight: pick.perim });
   r.sights = placeSights(r, pick.set);
   r.rank = r.match + 6 * r.sights.length;
   return r;
 }
 async function createSightRoutes() {
-  showMsg("Buscando lugares interesantes cerca de ti…");
-  const L = S.km * 1000;
-  // Primero en español; si hay pocos lugares (fuera de países hispanos), también en inglés.
-  let sights = await findSights(S.start.lat, S.start.lng, L * .45, "es"); S.wlang = "es";
-  if (sights.length < 4) { const en = await findSights(S.start.lat, S.start.lng, L * .45, "en").catch(() => []); if (en.length > sights.length) { sights = en; S.wlang = "en"; } }
+  showMsg(t("findingPlaces"));
+  const L = S.km * 1000, other = LANG === "es" ? "en" : "es";
+  // Primero en el idioma del teléfono; si hay pocos lugares, también en el otro idioma.
+  let sights = await findSights(S.start.lat, S.start.lng, L * .45, LANG); S.wlang = LANG;
+  if (sights.length < 4) { const o = await findSights(S.start.lat, S.start.lng, L * .45, other).catch(() => []); if (o.length > sights.length) { sights = o; S.wlang = other; } }
   if (!sights.length) return [];
-  showMsg("Armando rutas que pasen por lugares como " + shortTitle(sights[0].title) + ". Tarda unos segundos.");
+  showMsg(t("buildingVia", esc(shortTitle(sights[0].title))));
   let factor = bike() ? 1.25 : 1.3, out = [];
   const avoid = {};
   for (let round = 0; round < 2; round++) {
@@ -639,34 +790,15 @@ async function loadSightInfo() {
   } catch (e) {}
   renderSights();
 }
-function firstSentence(t) { const s = String(t || "").split(". ")[0]; return s.length > 180 ? s.slice(0, 177) + "…" : s + "."; }
+function firstSentence(x) { const s = String(x || "").split(". ")[0]; return s.length > 180 ? s.slice(0, 177) + "…" : s + "."; }
 function renderSights() {
   const rt = S.routes[S.opt], list = rt && rt.sights;
   $("sightsBox").hidden = !(list && list.length);
   if (!list || !list.length) return;
   $("sights").innerHTML = list.map((s, i) => {
     const inf = S.sightInfo[s.id] || {};
-    return '<li>' + (inf.thumb ? '<img src="' + esc(inf.thumb) + '" alt="" loading="lazy" onerror="this.remove()">' : '<span class="ph"></span>') + '<div><b>' + (i + 1) + '. ' + esc(shortTitle(s.title)) + '</b><small>km ' + (s.along / 1000).toFixed(1) + (inf.extract ? ' · ' + esc(firstSentence(inf.extract)) : '') + '</small><a href="https://' + S.wlang + '.wikipedia.org/?curid=' + s.id + '" target="_blank" rel="noopener">Leer más</a></div></li>';
+    return '<li>' + (inf.thumb ? '<img src="' + esc(inf.thumb) + '" alt="" loading="lazy" onerror="this.remove()">' : '<span class="ph"></span>') + '<div><b>' + (i + 1) + '. ' + esc(shortTitle(s.title)) + '</b><small>km ' + (s.along / 1000).toFixed(1) + (inf.extract ? ' · ' + esc(firstSentence(inf.extract)) : '') + '</small><a href="https://' + S.wlang + '.wikipedia.org/?curid=' + s.id + '" target="_blank" rel="noopener">' + t("readMore") + '</a></div></li>';
   }).join("");
-}
-async function openSharedSights() {
-  const parts = location.hash.split("lugares=")[1].split("_");
-  const lang = parts[0] === "en" ? "en" : "es", v = parts.slice(1).map(Number);
-  if (v.length < 9 || v.some(x => !isFinite(x))) return false;
-  S.wlang = lang;
-  if (v[0] > 0) { S.bikeType = BIKE_TYPES[v[0] - 1] || BIKE_TYPES[0]; setSport("bike", true); } else setSport("run", true);
-  S.km = v[1]; TYPES.forEach((t, i) => S.mix[t.k] = v[2 + i]); setMode("sights"); renderSetup();
-  setStart(v[6], v[7], "shared", "punto de la ruta compartida"); map.setView([v[6], v[7]], 14);
-  showMsg("Cargando la ruta que te compartieron…");
-  try {
-    const ids = v.slice(8);
-    const j = await getJSON(wapi(lang) + "action=query&prop=coordinates&pageids=" + ids.join("%7C"));
-    const pages = (j.query && j.query.pages) || {};
-    const set = ids.map(id => pages[id]).filter(p => p && p.coordinates).map(p => ({ id: p.pageid, title: p.title, lat: p.coordinates[0].lat, lon: p.coordinates[0].lon }));
-    S.routes = [await fetchVia({ set, perim: 1 })]; S.opt = 0;
-    showMsg("Esta es la ruta que te compartieron."); showResult(true); await loadSightInfo();
-  } catch (e) { showMsg(errText(e.status || 0), true); }
-  return true;
 }
 
 // ================= Resultado =================
@@ -678,16 +810,16 @@ function showResult(scroll) {
 }
 function renderResult() {
   const rt = S.routes[S.opt];
-  $("opts").innerHTML = S.routes.map((r, i) => '<button type="button" class="opt" data-o="' + i + '" aria-pressed="' + (i === S.opt) + '"><small>Opción ' + (i + 1) + '</small><b>' + r.match + '%</b><small>' + fmtKm(r.total) + ' km' + (r.sights && r.sights.length ? ' · ' + r.sights.length + (r.sights.length === 1 ? ' lugar' : ' lugares') : '') + '</small></button>').join("");
-  $("more").hidden = S.routes.length < 2 && !rt.seed;
-  $("stats").innerHTML = '<div class="stat"><span>Distancia</span><b>' + fmtKm(rt.total) + ' km</b></div><div class="stat"><span>Desnivel +</span><b>' + Math.round(rt.ascent) + ' m</b></div><div class="stat"><span>Tiempo a ' + (bike() ? S.speed + ' km/h' : fmtPace(S.pace)) + '</span><b>' + fmtDur(estMinutes(rt)) + '</b></div>';
-  $("roads").textContent = "Avenidas y calles grandes: " + rt.busy + "%" + (bike() ? " · Ciclovías y senderos: " : " · Banquetas, senderos y parques: ") + rt.foot + "%";
-  $("compare").innerHTML = TYPES.map(t => '<div class="crow" style="--c:var(--' + t.k + ')"><span>' + t.name + '</span><span class="bar"><i style="width:' + rt.real[t.k] + '%"></i></span><code>' + S.mix[t.k] + '% → ' + rt.real[t.k] + '%</code></div>').join("");
+  $("opts").innerHTML = S.routes.map((r, i) => '<button type="button" class="opt" data-o="' + i + '" aria-pressed="' + (i === S.opt) + '"><small>' + t("option", i + 1) + '</small><b>' + r.match + '%</b><small>' + fmtKm(r.total) + ' km' + (r.sights && r.sights.length ? ' · ' + r.sights.length + ' ' + t(r.sights.length === 1 ? "place1" : "placeN") : '') + '</small></button>').join("");
+  $("more").hidden = !!S.challenge || (S.routes.length < 2 && !rt.seed);
+  $("stats").innerHTML = '<div class="stat"><span>' + t("distance") + '</span><b>' + fmtKm(rt.total) + ' km</b></div><div class="stat"><span>' + t("gain") + '</span><b>' + Math.round(rt.ascent) + ' m</b></div><div class="stat"><span>' + t("timeAt", bike() ? S.speed + ' km/h' : fmtPace(S.pace)) + '</span><b>' + fmtDur(estMinutes(rt)) + '</b></div>';
+  $("roads").textContent = t("bigRoads", rt.busy) + " · " + t(bike() ? "bikeways" : "footways", rt.foot);
+  $("compare").innerHTML = TYPES.map(x => '<div class="crow" style="--c:var(--' + x.k + ')"><span>' + x.name + '</span><span class="bar"><i style="width:' + rt.real[x.k] + '%"></i></span><code>' + S.mix[x.k] + '% → ' + rt.real[x.k] + '%</code></div>').join("");
   const hr = new Date().getHours(); $("night").hidden = !(hr >= 19 || hr < 6);
-  $("bikeWarn").hidden = !bike(); $("start").textContent = bike() ? "Empezar a rodar" : "Empezar a correr";
+  $("bikeWarn").hidden = !bike(); $("start").textContent = t(bike() ? "startBike" : "startRun");
   renderSights();
   $("profile").innerHTML = profileSVG(rt);
-  $("profLabel").textContent = "Toca o desliza sobre el perfil para ver ese punto en el mapa.";
+  $("profLabel").textContent = t("profHint");
   drawRoutes(true);
 }
 $("opts").addEventListener("click", e => { const o = e.target.closest("[data-o]"); if (o) { S.opt = +o.dataset.o; renderResult(); } });
@@ -725,7 +857,7 @@ function profileSVG(rt) {
   for (let k = 0; k <= km + 1e-6; k += kStep) s += '<text x="' + x(k * 1000) + '" y="' + (H - 6) + '" font-size="11" text-anchor="middle" fill="var(--muted)" font-family="var(--f-data)">' + k + ' km</text>';
   rt.bins.forEach(b => s += '<path d="M' + x(b.from) + ',' + y(lo) + ' L' + x(b.from) + ',' + y(b.e0) + ' L' + x(b.to) + ',' + y(b.e1) + ' L' + x(b.to) + ',' + y(lo) + ' Z" fill="var(--' + b.t + ')" opacity=".85"/>');
   s += '<line id="pcur" x1="0" x2="0" y1="' + pad.t + '" y2="' + (H - pad.b) + '" stroke="var(--ink)" stroke-width="2" visibility="hidden"/>';
-  return '<svg id="psvg" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Perfil de elevación" data-l="' + pad.l + '" data-w="' + (W - pad.l - pad.r) + '">' + s + '</svg>';
+  return '<svg id="psvg" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + t("profileTitle") + '" data-l="' + pad.l + '" data-w="' + (W - pad.l - pad.r) + '">' + s + '</svg>';
 }
 function profilePoint(e) {
   const svg = $("psvg"); if (!svg || !S.routes.length) return;
@@ -735,7 +867,7 @@ function profilePoint(e) {
   const p = rt.at(d), bin = rt.bins[Math.min(rt.bins.length - 1, Math.floor(d / BIN))];
   const cur = $("pcur"); cur.setAttribute("x1", l + d / rt.total * w); cur.setAttribute("x2", l + d / rt.total * w); cur.setAttribute("visibility", "visible");
   if (!cursor) cursor = L.circleMarker([p.ll[1], p.ll[0]], { radius: 8, color: "#fff", weight: 3, fillColor: C("accent"), fillOpacity: 1 }).addTo(map); else cursor.setLatLng([p.ll[1], p.ll[0]]);
-  $("profLabel").textContent = "km " + (d / 1000).toFixed(1) + " · " + Math.round(p.e) + " m de altura · " + NAMES[bin.t];
+  $("profLabel").textContent = t("profAt", (d / 1000).toFixed(1), Math.round(p.e), NAMES[bin.t]);
 }
 $("profile").addEventListener("pointerdown", profilePoint);
 $("profile").addEventListener("pointermove", e => { if (e.pointerType === "mouse" || e.buttons) profilePoint(e); });
@@ -743,57 +875,89 @@ $("profile").addEventListener("pointermove", e => { if (e.pointerType === "mouse
 // ================= Guardar, compartir y GPX =================
 function packRoute(rt, name) {
   return { id: Date.now(), name, date: new Date().toISOString(), km: S.km, mix: Object.assign({}, S.mix), quiet: S.quiet, routeMode: S.routeMode, sport: S.sport, bikeType: S.bikeType, start: S.start, seed: rt.seed || 0, points: rt.points || 0, factor: rt.factor || 0,
-    ascent: Math.round(rt.ascent), busy: rt.busy, foot: rt.foot, coords: rt.coords.map(c => [+c[0].toFixed(5), +c[1].toFixed(5), Math.round(c[2] || 0)]),
+    ascent: Math.round(rt.ascent), busy: rt.busy, foot: rt.foot, coords: rt.coords.map(c => [+c[0].toFixed(5), +c[1].toFixed(5), Math.round(c[2] || 0)]), steps: rt.steps || [],
     sights: rt.sights || null, wlang: S.wlang, info: rt.sights ? Object.fromEntries(rt.sights.map(s => [s.id, S.sightInfo[s.id] || null])) : null };
 }
 function openPacked(p) {
   if (p.bikeType) S.bikeType = p.bikeType;
-  setSport(p.sport || "run", true); S.km = p.km; S.mix = Object.assign({}, p.mix); setMode(p.routeMode || (p.quiet ? "quiet" : "normal")); renderSetup();
+  setSport(p.sport || "run", true); S.km = p.km; S.mix = Object.assign({}, p.mix); S.quiet = !!p.quiet; setMode(p.routeMode === "sights" ? "sights" : "train"); renderSetup();
   if (p.start) setStart(p.start.lat, p.start.lng, "saved", p.name);
   if (p.info) Object.keys(p.info).forEach(k => { if (p.info[k]) S.sightInfo[k] = p.info[k]; });
   if (p.wlang) S.wlang = p.wlang;
-  S.routes = [routeFrom(p.coords, { ascent: p.ascent, busy: p.busy || 0, foot: p.foot || 0, seed: p.seed, points: p.points, factor: p.factor, sights: p.sights || null })]; S.opt = 0;
+  S.routes = [routeFrom(p.coords, { ascent: p.ascent, busy: p.busy || 0, foot: p.foot || 0, seed: p.seed, points: p.points, factor: p.factor, sights: p.sights || null, steps: p.steps || [] })]; S.opt = 0;
   showResult(true);
 }
 $("save").addEventListener("click", () => {
   const rt = S.routes[S.opt], list = store.get("rm_saved", []);
-  const name = "Ruta de " + fmtKm(rt.total) + " km · " + new Date().toLocaleDateString("es-MX", { day: "numeric", month: "short" });
-  list.unshift(packRoute(rt, name));
-  showMsg(store.set("rm_saved", list.slice(0, 15)) ? "Ruta guardada en Mis rutas. La puedes abrir aunque no tengas internet." : "No se pudo guardar. Tu teléfono no tiene espacio para la app.", false);
+  list.unshift(packRoute(rt, t("routeOf", fmtKm(rt.total)) + " · " + dateFmt(Date.now(), { day: "numeric", month: "short" })));
+  showMsg(store.set("rm_saved", list.slice(0, 15)) ? t("savedOk") : t("saveFail"), false);
 });
+const canLink = rt => !!(rt.seed || (rt.sights && rt.sights.length));
 function shareUrl(rt) {
-  if (rt.sights && rt.sights.length) return location.origin + location.pathname + "#lugares=" + [S.wlang, bike() ? BIKE_TYPES.indexOf(S.bikeType) + 1 : 0, S.km, S.mix.plano, S.mix.ondulado, S.mix.subida, S.mix.bajada, S.start.lat.toFixed(5), S.start.lng.toFixed(5)].concat(rt.sights.map(s => s.id)).join("_");
-  const v = [S.start.lat.toFixed(5), S.start.lng.toFixed(5), S.km, S.mix.plano, S.mix.ondulado, S.mix.subida, S.mix.bajada, S.quiet ? 1 : 0, rt.seed, rt.points, rt.factor, bike() ? BIKE_TYPES.indexOf(S.bikeType) + 1 : 0];
-  return location.origin + location.pathname + "#ruta=" + v.join("_");
+  const base = location.origin + location.pathname, bk = bike() ? BIKE_TYPES.indexOf(S.bikeType) + 1 : 0;
+  if (rt.sights && rt.sights.length) return base + "#lugares=" + [S.wlang, bk, S.km, S.mix.plano, S.mix.ondulado, S.mix.subida, S.mix.bajada, S.start.lat.toFixed(5), S.start.lng.toFixed(5)].concat(rt.sights.map(s => s.id)).join("_");
+  return base + "#ruta=" + [S.start.lat.toFixed(5), S.start.lng.toFixed(5), S.km, S.mix.plano, S.mix.ondulado, S.mix.subida, S.mix.bajada, S.quiet ? 1 : 0, rt.seed, rt.points, rt.factor, bk].join("_");
 }
-async function copyText(t) { try { await navigator.clipboard.writeText(t); return true; } catch (e) { return false; } }
-$("share").addEventListener("click", async () => {
-  const rt = S.routes[S.opt];
-  if (!rt.seed && !(rt.sights && rt.sights.length)) { showMsg("Esta ruta no se puede compartir con link. Usa el botón Reloj (GPX) para enviar el archivo.", true); return; }
-  const url = shareUrl(rt), text = "Te comparto mi ruta de " + fmtKm(rt.total) + " km en Ruta a Medida";
+async function copyText(x) { try { await navigator.clipboard.writeText(x); return true; } catch (e) { return false; } }
+async function shareLink(url, text) {
   if (navigator.share) { try { await navigator.share({ title: "Ruta a Medida", text, url }); return; } catch (e) { if (e.name === "AbortError") return; } }
-  showMsg((await copyText(url)) ? "Link copiado. Pégalo en WhatsApp o donde quieras." : "Copia este link: " + url, false);
+  showMsg((await copyText(text + " " + url)) ? t("linkCopied") : t("copyThis", esc(url)), false);
+}
+$("share").addEventListener("click", () => {
+  const rt = S.routes[S.opt];
+  if (!canLink(rt)) { showMsg(t("noLink"), true); return; }
+  shareLink(shareUrl(rt), t("shareText", fmtKm(rt.total)));
 });
+async function shareFile(file, title) {
+  if (navigator.canShare && navigator.canShare({ files: [file] })) { try { await navigator.share({ files: [file], title }); return true; } catch (e) { if (e.name === "AbortError") return true; } }
+  const a = document.createElement("a"); a.href = URL.createObjectURL(file); a.download = file.name; document.body.appendChild(a); a.click(); a.remove();
+  return false;
+}
 $("gpx").addEventListener("click", async () => {
   const rt = S.routes[S.opt], name = "Ruta a Medida " + fmtKm(rt.total) + " km";
   const pts = rt.coords.map(c => '<trkpt lat="' + c[1] + '" lon="' + c[0] + '"><ele>' + Math.round(c[2] || 0) + '</ele></trkpt>').join("");
   const xml = '<?xml version="1.0" encoding="UTF-8"?><gpx version="1.1" creator="Ruta a Medida" xmlns="http://www.topografix.com/GPX/1/1"><metadata><name>' + name + '</name></metadata><trk><name>' + name + '</name><trkseg>' + pts + '</trkseg></trk></gpx>';
-  const file = new File([xml], "ruta-a-medida-" + fmtKm(rt.total).replace(".", "-") + "km.gpx", { type: "application/gpx+xml" });
-  if (navigator.canShare && navigator.canShare({ files: [file] })) { try { await navigator.share({ files: [file], title: name }); return; } catch (e) { if (e.name === "AbortError") return; } }
-  const a = document.createElement("a"); a.href = URL.createObjectURL(file); a.download = file.name; document.body.appendChild(a); a.click(); a.remove();
-  showMsg("Archivo GPX listo. Ábrelo en Garmin Connect, Strava o la app de tu reloj para seguir la ruta.", false);
+  await shareFile(new File([xml], "ruta-a-medida-" + fmtKm(rt.total).replace(".", "-") + "km.gpx", { type: "application/gpx+xml" }), name);
+  showMsg(t("gpxReady"), false);
 });
 
-// ================= Mis rutas =================
-function renderSaved() {
-  const last = store.get("rm_last", null), list = store.get("rm_saved", []), runs = store.get("rm_runs", []);
-  const items = (last ? [Object.assign({}, last, { isLast: true })] : []).concat(list);
-  $("savedList").innerHTML = items.length ? items.map((p, i) => '<li><span><b>' + esc(p.name) + '</b><small>' + fmtKm(analyzeLen(p.coords)) + ' km · ' + (p.sport === "bike" ? "Bici · " : "") + p.mix.plano + '/' + p.mix.ondulado + '/' + p.mix.subida + '/' + p.mix.bajada + '</small></span><button type="button" data-open="' + i + '">Abrir</button>' + (p.isLast ? '<span></span>' : '<button type="button" data-del="' + i + '">Borrar</button>') + '</li>').join("") : '<p class="empty">Todavía no guardas rutas. Crea una y toca Guardar.</p>';
-  $("savedList")._items = items;
-  $("runsList").innerHTML = runs.length ? runs.slice(0, 20).map(r => '<li><span><b>' + fmtKm(r.dist) + ' km en ' + fmtClock(r.time) + '</b><small>' + new Date(r.date).toLocaleDateString("es-MX", { day: "numeric", month: "short", year: "numeric" }) + (r.sport === "bike" ? ' · en bici · ' + (r.dist / 1000 / (r.time / 3600)).toFixed(1) + ' km/h' : ' · ritmo ' + fmtPace(r.time / (r.dist / 1000)) + ' /km') + '</small></span><span></span><span></span></li>').join("") : '<p class="empty">Aquí verás tus carreras terminadas.</p>';
+// ================= Logros =================
+const BADGES = [["first", "1"], ["5k", "5K"], ["10k", "10K"], ["21k", "21K"], ["bike40", "40"], ["explorer", "10"], ["globe", "3"], ["streak", "3s"], ["hills", "200"], ["win", "1º"]];
+function weekNo(d) { return Math.floor((new Date(d).getTime() / 86400000 + 3) / 7); }
+function checkBadges(run) {
+  const b = store.get("rm_badges", {}), runs = store.get("rm_runs", []), seen = store.get("rm_seen", []), newly = [];
+  const give = k => { if (!b[k]) { b[k] = Date.now(); newly.push(k); } };
+  if (run.completed) give("first");
+  if (run.sport !== "bike" && run.dist >= 5000) give("5k");
+  if (run.sport !== "bike" && run.dist >= 10000) give("10k");
+  if (run.sport !== "bike" && run.dist >= 21097) give("21k");
+  if (run.sport === "bike" && run.dist >= 40000) give("bike40");
+  if (seen.length >= 10) give("explorer");
+  const cities = []; runs.forEach(x => { if (x.start && !cities.some(c => haversine(c, x.start) < 30000)) cities.push(x.start); });
+  if (cities.length >= 3) give("globe");
+  const weeks = new Set(runs.map(x => weekNo(x.date))), w = weekNo(Date.now());
+  if (weeks.has(w) && weeks.has(w - 1) && weeks.has(w - 2)) give("streak");
+  if (run.climb >= 200) give("hills");
+  if (run.won) give("win");
+  store.set("rm_badges", b);
+  return newly;
 }
+function renderBadges() {
+  const b = store.get("rm_badges", {});
+  $("badges").innerHTML = BADGES.map(([k, ic]) => '<div class="badge' + (b[k] ? ' on' : '') + '"><i>' + ic + '</i><b>' + t("b_" + k) + '</b><small>' + t("b_" + k + "D") + '</small></div>').join("");
+}
+
+// ================= Mis rutas =================
 function analyzeLen(coords) { let d = 0; for (let i = 1; i < coords.length; i++) d += haversine(coords[i - 1], coords[i]); return d; }
-$("openSaved").addEventListener("click", () => { renderSaved(); $("saved").showModal(); });
+function renderSaved() {
+  renderBadges();
+  const last = store.get("rm_last", null), list = store.get("rm_saved", []), runs = store.get("rm_runs", []);
+  const items = (last ? [Object.assign({}, last, { isLast: true, name: t("lastRoute") })] : []).concat(list);
+  $("savedList").innerHTML = items.length ? items.map((p, i) => '<li><span><b>' + esc(p.name) + '</b><small>' + fmtKm(analyzeLen(p.coords)) + ' km · ' + (p.sport === "bike" ? t("bikeTag") : "") + (p.sights && p.sights.length ? p.sights.length + ' ' + t(p.sights.length === 1 ? "place1" : "placeN") : p.mix.plano + '/' + p.mix.ondulado + '/' + p.mix.subida + '/' + p.mix.bajada) + '</small></span><button type="button" data-open="' + i + '">' + t("open") + '</button>' + (p.isLast ? '<span></span>' : '<button type="button" data-del="' + i + '">' + t("del") + '</button>') + '</li>').join("") : '<p class="empty">' + t("noSaved") + '</p>';
+  $("savedList")._items = items;
+  $("runsList").innerHTML = runs.length ? runs.slice(0, 20).map(r => '<li><span><b>' + t("runLine", fmtKm(r.dist), fmtClock(r.time)) + '</b><small>' + dateFmt(r.date, { day: "numeric", month: "short", year: "numeric" }) + (r.sport === "bike" ? t("runBike", (r.dist / 1000 / (r.time / 3600)).toFixed(1)) : t("runPace", fmtPace(r.time / (r.dist / 1000)))) + '</small></span><span></span><span></span></li>').join("") : '<p class="empty">' + t("noRuns") + '</p>';
+}
+$("openSaved").addEventListener("click", () => { renderSaved(); $("saved").showModal(); $("saved").scrollTop = 0; });
 $("savedClose").addEventListener("click", () => $("saved").close());
 $("savedList").addEventListener("click", e => {
   const items = $("savedList")._items, o = e.target.closest("[data-open]"), d = e.target.closest("[data-del]");
@@ -802,37 +966,41 @@ $("savedList").addEventListener("click", e => {
 });
 
 // ================= Ajustes =================
-$("paceSel").innerHTML = PACES.map(p => '<option value="' + p + '">' + fmtPace(p) + ' min/km' + (p <= 270 ? " · competitivo" : p <= 330 ? " · rápido" : p <= 390 ? " · cómodo" : p <= 480 ? " · suave" : " · principiante") + '</option>').join("");
+$("paceSel").innerHTML = PACES.map(p => '<option value="' + p + '">' + fmtPace(p) + ' min/km · ' + t(p <= 270 ? "paceComp" : p <= 330 ? "paceFast" : p <= 390 ? "paceEasy" : p <= 480 ? "paceSoft" : "paceNew") + '</option>').join("");
 $("speedSel").innerHTML = SPEEDS.map(s => '<option value="' + s + '">' + s + ' km/h</option>').join("");
-$("openCfg").addEventListener("click", () => { $("speedSel").value = String(S.speed); $("paceSel").value = String(S.pace); $("voiceChk").checked = S.voice; $("key").value = rawKey(); $("cfg").showModal(); });
+$("openCfg").addEventListener("click", () => { $("nameIn").value = S.name; $("voiceSel").value = S.voiceMode; $("speedSel").value = String(S.speed); $("paceSel").value = String(S.pace); $("key").value = rawKey(); $("cfg").showModal(); });
 $("cfgCancel").addEventListener("click", () => $("cfg").close());
 $("cfgSave").addEventListener("click", () => {
-  S.pace = +$("paceSel").value; S.speed = +$("speedSel").value; store.set("rm_speed", S.speed); S.voice = $("voiceChk").checked;
-  store.set("rm_pace", S.pace); store.set("rm_voice", S.voice);
+  S.name = $("nameIn").value.trim(); S.voiceMode = $("voiceSel").value; S.pace = +$("paceSel").value; S.speed = +$("speedSel").value;
+  store.set("rm_name", S.name); store.set("rm_voicemode", S.voiceMode); store.set("rm_pace", S.pace); store.set("rm_speed", S.speed);
   try { const k = $("key").value.trim(); if (k) localStorage.setItem("ors_key", k); else localStorage.removeItem("ors_key"); } catch (e) {}
   $("cfg").close(); if (S.routes.length) renderResult();
 });
+
+// ================= Voz =================
+// level "turn": solo con guía completa. level "alert": completa o solo avisos.
+function say(text, level) {
+  if (S.voiceMode === "off" || (level === "turn" && S.voiceMode !== "full") || !("speechSynthesis" in window)) return;
+  try { const u = new SpeechSynthesisUtterance(text); u.lang = LANG === "es" ? "es-MX" : "en-US"; if (speechSynthesis.pending) speechSynthesis.cancel(); speechSynthesis.speak(u); } catch (e) {}
+}
+function metersText(m) { return m >= 1000 ? (m < 1050 ? t("km1") : t("kms", (m / 1000).toFixed(1).replace(".0", ""))) : t("meters", Math.max(10, Math.round(m / 10) * 10)); }
+const lowerFirst = x => x.charAt(0).toLowerCase() + x.slice(1);
 
 // ================= Modo carrera =================
 let wake = null, tick = null;
 async function keepAwake() { try { if ("wakeLock" in navigator && document.visibilityState === "visible") wake = await navigator.wakeLock.request("screen"); } catch (e) {} }
 document.addEventListener("visibilitychange", () => { if (S.run && !S.run.paused && document.visibilityState === "visible") keepAwake(); });
-function say(t) {
-  if (!S.voice || !("speechSynthesis" in window)) return;
-  try { const u = new SpeechSynthesisUtterance(t); u.lang = "es-MX"; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch (e) {}
-}
-function metersText(m) { return m >= 1000 ? (m / 1000).toFixed(1).replace(".0", "") + " kilómetros" : Math.round(m / 50) * 50 + " metros"; }
 function runElapsed() { const r = S.run; return r.acc + (r.paused ? 0 : (Date.now() - r.t0) / 1000); }
 
 $("start").addEventListener("click", () => {
   const rt = S.routes[S.opt];
-  S.run = { rt, t0: Date.now(), acc: 0, paused: false, dist: 0, last: null, idx: 0, done: 0, off: false, cued: {}, kmSaid: 0, samples: [], sightSaid: {} };
+  S.run = { rt, t0: Date.now(), acc: 0, paused: false, dist: 0, last: null, idx: 0, done: 0, off: false, cued: {}, kmSaid: 0, samples: [], sightSaid: {}, stepSaid: {}, ghostSaid: 0 };
   document.body.classList.add("running"); $("run").hidden = false;
   if (cursor) { cursor.remove(); cursor = null; }
   setTimeout(() => map.invalidateSize(), 50);
   S.follow = true; keepAwake();
   if (watchId === null) locate(false);
-  say("Empieza tu ruta de " + metersText(rt.total) + ". Ve al punto verde.");
+  say(t("vStart", metersText(rt.total)), "alert");
   tick = setInterval(renderRun, 1000); renderRun();
   if (S.here) onRunPosition({ coords: { latitude: S.here.lat, longitude: S.here.lng, accuracy: S.here.acc }, timestamp: Date.now() });
 });
@@ -840,96 +1008,181 @@ map.on("dragstart", () => { if (S.run) S.follow = false; });
 $("center").addEventListener("click", () => { S.follow = true; if (S.here) map.setView([S.here.lat, S.here.lng], Math.max(map.getZoom(), 16)); });
 $("pause").addEventListener("click", () => {
   const r = S.run; if (!r) return;
-  if (r.paused) { r.paused = false; r.t0 = Date.now(); r.last = null; r.lastT = 0; $("pause").textContent = "Pausar"; keepAwake(); say("Seguimos."); }
-  else { r.acc = runElapsed(); r.paused = true; $("pause").textContent = "Seguir"; say("Pausa."); }
+  if (r.paused) { r.paused = false; r.t0 = Date.now(); r.last = null; r.lastT = 0; $("pause").textContent = t("pause"); keepAwake(); say(t("vResume"), "alert"); }
+  else { r.acc = runElapsed(); r.paused = true; $("pause").textContent = t("resume"); say(t("vPause"), "alert"); }
   renderRun();
 });
 $("finish").addEventListener("click", () => endRun(false));
+
+// Reto: dónde iría tu amigo en este momento, a su ritmo promedio.
+function ghostGap(r) { const c = S.challenge; if (!c) return null; const g = Math.min(r.rt.total, runElapsed() / c.time * r.rt.total); return r.done - g; }
 
 function onRunPosition(p) {
   const r = S.run; if (!r || r.paused) return;
   const acc = p.coords.accuracy || 30, here = [p.coords.longitude, p.coords.latitude];
   if (S.follow) map.panTo([here[1], here[0]], { animate: true });
   if (acc > 60) return;
-  // Distancia recorrida con el GPS (ignora saltos pequeños por ruido).
-  // Distancia con GPS (solo se usa fuera de la ruta). Si el GPS salta lejos (túnel, sin señal), cuenta solo si la velocidad es posible corriendo.
+  // Distancia con GPS (solo se usa fuera de la ruta). Si el GPS salta lejos (túnel, sin señal), cuenta solo si la velocidad es posible.
   const now = runElapsed();
   let gpsStep = 0;
   if (r.last) { const step = haversine(r.last, here), dt = Math.max(1, now - r.lastT); if (step >= 4) { if (step < 200 || step / dt < (bike() ? 25 : 8)) gpsStep = step; r.last = here; r.lastT = now; } }
   else { r.last = here; r.lastT = now; }
-  // Avance sobre la ruta: busca el punto de la ruta más cercano, hacia adelante.
+  // Avance sobre la ruta: mide contra cada tramo de la línea, solo un poco hacia adelante (la salida y la meta están en el mismo lugar).
   const rt = r.rt, n = rt.coords.length;
   let best = -1, bestD = 1e9, bestAlong = 0;
-  // Solo mira un poco hacia adelante, para no confundir la salida con la meta (están en el mismo lugar).
-  // Mide contra cada tramo de la línea, no solo contra sus puntos: en calles rectas los puntos quedan lejos.
   const ahead = Math.max(r.done, r.dist) + (bike() ? 900 : 300);
   for (let i = Math.max(0, r.idx - 5); i < n - 1 && rt.cum[i] <= ahead; i++) { const pr = project(here, rt.coords[i], rt.coords[i + 1]); if (pr.d < bestD) { bestD = pr.d; best = i; bestAlong = rt.cum[i] + pr.t * (rt.cum[i + 1] - rt.cum[i]); } }
   const offNow = bestD > (bike() ? 60 : 45) + acc / 2;
-  if (offNow && !r.off) say("Te saliste de la ruta. Regresa a la línea de color.");
+  if (offNow && !r.off) say(t("vOff"), "alert");
   r.off = offNow; $("offroute").hidden = !offNow;
   // Sobre la ruta, lo recorrido se mide sobre la línea (sin el ruido del GPS). Fuera de ella, con el GPS.
   if (!offNow && best >= 0 && bestAlong >= r.done - 50) { const prev = r.done; r.idx = best; r.done = Math.max(r.done, bestAlong); r.dist += Math.min(r.done - prev, bike() ? 900 : 300); }
   else if (offNow) r.dist += gpsStep;
   r.samples.push({ t: now, d: r.dist }); if (r.samples.length > 60) r.samples.shift();
-  // Avisos: kilómetro cumplido y próximo tramo con pendiente.
+  // Guía completa: el siguiente giro, un poco antes de llegar.
+  const st = (rt.steps || []).find(s => s.along > r.done - 10 && !r.stepSaid[s.along]);
+  if (st && st.along - r.done <= (bike() ? 90 : 45)) { r.stepSaid[st.along] = 1; say(st.along - r.done > 15 ? t("vTurn", metersText(st.along - r.done), lowerFirst(st.text)) : st.text, "turn"); }
+  // Kilómetros (cada 5 km en bici).
   const every = bike() ? 5 : 1, k = Math.floor(r.dist / 1000 / every) * every;
-  if (k > r.kmSaid) { r.kmSaid = k; const spk = runElapsed() / (r.dist / 1000); say("Kilómetro " + k + ". " + (bike() ? "Velocidad " + Math.round(3600 / spk) + " kilómetros por hora." : "Ritmo " + fmtPace(spk).replace(":", " con ") + ".")); }
-  // Solo avisa subidas y bajadas (lo ondulado es suave y llenaría de avisos).
+  if (k > r.kmSaid) {
+    r.kmSaid = k; const spk = runElapsed() / (r.dist / 1000), pc = fmtPace(spk).split(":");
+    say(bike() ? t("vKmBike", k, Math.round(3600 / spk)) : t("vKm", k, t("paceSpeech", pc[0], pc[1])), "alert");
+    const gap = ghostGap(r);
+    if (gap !== null && Math.abs(gap) >= 10) say(t(gap > 0 ? "vGhost" : "vGhostB", metersText(Math.abs(gap)), S.challenge.name), "alert");
+  }
+  // Subidas y bajadas (lo ondulado es suave y llenaría de avisos).
   const nxt = rt.segs.find(s => s.from > r.done && s.to - s.from >= 80 && (s.t === "subida" || s.t === "bajada"));
-  if (nxt && nxt.from - r.done <= (bike() ? 400 : 200) && !r.cued[nxt.from]) { r.cued[nxt.from] = 1; say("En " + metersText(nxt.from - r.done) + ", " + NAMES[nxt.t] + " de " + metersText(nxt.to - nxt.from) + "."); }
+  if (nxt && nxt.from - r.done <= (bike() ? 400 : 200) && !r.cued[nxt.from]) { r.cued[nxt.from] = 1; say(t("vHill", metersText(nxt.from - r.done), NAMES[nxt.t], metersText(nxt.to - nxt.from)), "alert"); }
   // Lugares: avisa poco antes de llegar y cuenta un poco de cada uno.
   if (rt.sights) {
     const sg = rt.sights.find(s => s.along > r.done - 20 && !r.sightSaid[s.id]);
-    if (sg && sg.along - r.done <= (bike() ? 300 : 150)) { r.sightSaid[sg.id] = 1; const inf = S.sightInfo[sg.id]; say((sg.along - r.done > 40 ? "En " + metersText(sg.along - r.done) + ": " : "Estás pasando por ") + shortTitle(sg.title) + "." + (inf && inf.extract ? " " + firstSentence(inf.extract) : "")); }
+    if (sg && sg.along - r.done <= (bike() ? 300 : 150)) { r.sightSaid[sg.id] = 1; const inf = S.sightInfo[sg.id]; say((sg.along - r.done > 40 ? t("vPlaceIn", metersText(sg.along - r.done), shortTitle(sg.title)) : t("vPlaceNow", shortTitle(sg.title))) + (inf && inf.extract ? " " + firstSentence(inf.extract) : ""), "alert"); }
   }
   if (r.done >= rt.total - 40 && r.dist >= rt.total * .8) endRun(true);
   renderRun();
 }
 function renderRun() {
   const r = S.run; if (!r) return;
-  const rt = r.rt, t = runElapsed();
+  const rt = r.rt, tt = runElapsed();
   $("rDone").textContent = (r.dist / 1000).toFixed(2);
   $("rLeft").textContent = (Math.max(0, rt.total - r.done) / 1000).toFixed(2);
-  $("rTime").textContent = fmtClock(t);
-  const a = r.samples.find(s => s.t >= t - 60), cur = a && r.dist - a.d > 30 ? (t - a.t) / ((r.dist - a.d) / 1000) : t / (r.dist / 1000);
-  $("rPaceL").textContent = bike() ? "km/h" : "Ritmo";
+  $("rTime").textContent = fmtClock(tt);
+  const a = r.samples.find(s => s.t >= tt - 60), cur = a && r.dist - a.d > 30 ? (tt - a.t) / ((r.dist - a.d) / 1000) : tt / (r.dist / 1000);
+  $("rPaceL").textContent = bike() ? "km/h" : t("pace");
   $("rPace").textContent = r.dist > 50 ? (bike() ? (3600 / cur).toFixed(1) : fmtPace(cur)) : "--";
   $("rBar").style.width = Math.min(100, r.done / rt.total * 100) + "%";
+  const st = !r.paused && (rt.steps || []).find(s => s.along > r.done - 10);
+  $("turn").hidden = !(st && S.voiceMode === "full" && (r.done || r.dist));
+  if (st) $("turn").textContent = t("turnIn", st.text, Math.max(0, Math.round(st.along - r.done)));
   const curSeg = rt.segs.find(s => s.from <= r.done && s.to > r.done) || rt.segs[0];
   const nxt = rt.segs.find(s => s.from > r.done && s.to - s.from >= 80 && (s.t === "subida" || s.t === "bajada"));
-  let cue = r.paused ? "En pausa." : !r.done && !r.dist ? "Ve al punto verde para empezar." : "Ahora: <b>" + NAMES[curSeg.t] + "</b>";
-  if (!r.paused && (r.done || r.dist)) cue += nxt ? " · Próximo: <b>" + NAMES[nxt.t] + " de " + Math.round((nxt.to - nxt.from) / 50) * 50 + " m</b> en " + fmtKm(nxt.from - r.done) + " km" : " · Ya no hay subidas ni bajadas.";
+  let cue = r.paused ? t("cuePaused") : !r.done && !r.dist ? t("cueStart") : t("cueNow", NAMES[curSeg.t]);
+  if (!r.paused && (r.done || r.dist)) cue += nxt ? t("cueNext", NAMES[nxt.t], Math.round((nxt.to - nxt.from) / 50) * 50, fmtKm(nxt.from - r.done)) : t("cueNoHills");
   const ns = !r.paused && rt.sights ? rt.sights.find(s => s.along > r.done - 20) : null;
-  if (ns) cue += "<br>Lugar: <b>" + esc(shortTitle(ns.title)) + "</b> en " + fmtKm(Math.max(0, ns.along - r.done)) + " km";
+  if (ns) cue += t("cuePlace", esc(shortTitle(ns.title)), fmtKm(Math.max(0, ns.along - r.done)));
   $("cue").innerHTML = cue;
+  const gap = ghostGap(r);
+  $("ghost").hidden = gap === null;
+  if (gap !== null) { $("ghost").className = "ghostbar " + (gap >= 0 ? "ahead" : "behind"); $("ghost").textContent = Math.abs(gap) < 10 ? t("ghostEven", S.challenge.name) : t(gap > 0 ? "ghostAhead" : "ghostBehind", Math.round(Math.abs(gap)), S.challenge.name); }
 }
 function endRun(completed) {
   const r = S.run; if (!r) return;
-  const t = runElapsed(); clearInterval(tick); S.run = null;
+  const tt = runElapsed(); clearInterval(tick); S.run = null;
   try { if (wake) wake.release(); } catch (e) {} wake = null;
-  document.body.classList.remove("running"); $("run").hidden = true; $("offroute").hidden = true; $("pause").textContent = "Pausar";
+  document.body.classList.remove("running"); $("run").hidden = true; $("offroute").hidden = true; $("pause").textContent = t("pause");
   setTimeout(() => map.invalidateSize(), 50);
-  if (r.dist > 100) {
-    const runs = store.get("rm_runs", []); runs.unshift({ date: new Date().toISOString(), dist: r.dist, time: t, planned: r.rt.total, sport: S.sport }); store.set("rm_runs", runs.slice(0, 50));
-  }
-  say(completed ? "Ruta terminada. Excelente trabajo." : "Carrera terminada.");
-  $("sumBody").innerHTML = [["Distancia", fmtKm(r.dist) + " km"], ["Tiempo", fmtClock(t)], (bike() ? ["Velocidad promedio", r.dist > 50 ? (r.dist / 1000 / (t / 3600)).toFixed(1) + " km/h" : "--"] : ["Ritmo promedio", r.dist > 50 ? fmtPace(t / (r.dist / 1000)) + " /km" : "--"]), ["Ruta completada", Math.round(Math.min(100, r.done / r.rt.total * 100)) + "%"]]
+  const rt = r.rt, frac = Math.min(1, r.done / rt.total);
+  // Lugares por los que de verdad pasaste.
+  const passed = (rt.sights || []).filter(s => s.along <= r.done + 30);
+  const seen = store.get("rm_seen", []); passed.forEach(s => { const key = S.wlang + ":" + s.id; if (seen.indexOf(key) < 0) seen.push(key); }); store.set("rm_seen", seen);
+  const c = S.challenge, won = !!(c && completed && tt < c.time);
+  const run = { date: new Date().toISOString(), dist: r.dist, time: tt, planned: rt.total, sport: S.sport, completed: completed || frac >= .9, climb: Math.round(rt.ascent * frac), places: passed.length, won, start: [S.start.lng, S.start.lat] };
+  if (r.dist > 100) { const runs = store.get("rm_runs", []); runs.unshift(run); store.set("rm_runs", runs.slice(0, 50)); }
+  const newly = r.dist > 100 ? checkBadges(run) : [];
+  say(t(completed ? "vDone" : "vEnd"), "alert");
+  S.lastRun = { run, rt, passed };
+  $("sumGhost").hidden = !(c && completed);
+  if (c && completed) $("sumGhost").textContent = t(won ? "beat" : "lost", c.name, fmtClock(Math.abs(c.time - tt)));
+  $("sumBody").innerHTML = [[t("distance"), fmtKm(r.dist) + " km"], [t("time"), fmtClock(tt)], (bike() ? [t("avgSpeed"), r.dist > 50 ? (r.dist / 1000 / (tt / 3600)).toFixed(1) + " km/h" : "--"] : [t("avgPace"), r.dist > 50 ? fmtPace(tt / (r.dist / 1000)) + " /km" : "--"]), passed.length ? [t("placesSeen"), passed.length] : [t("completed"), Math.round(frac * 100) + "%"]]
     .map(x => '<div class="stat"><span>' + x[0] + '</span><b>' + x[1] + '</b></div>').join("");
+  $("sumBadges").innerHTML = newly.map(k => '<p class="newbadge">' + t("newBadge", t("b_" + k)) + '</p>').join("");
+  $("sumChallenge").hidden = !(canLink(rt) && completed && r.dist > 100);
   $("summary").showModal();
 }
 $("sumClose").addEventListener("click", () => $("summary").close());
+$("sumChallenge").addEventListener("click", () => {
+  const L0 = S.lastRun; if (!L0) return;
+  const name = S.name || t("aFriend");
+  shareLink(shareUrl(L0.rt) + "&reto=" + encodeURIComponent(name) + "_" + Math.round(L0.run.time), t("challengeText", name, fmtKm(L0.rt.total), fmtClock(L0.run.time)));
+});
 
-// ================= Ruta compartida por link =================
+// ================= Imagen para compartir =================
+async function makeCard(L0) {
+  const W = 1080, H = 1350, cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+  const g = cv.getContext("2d"), run = L0.run, rt = L0.rt;
+  const bg = g.createLinearGradient(0, 0, W, H); bg.addColorStop(0, "#14213d"); bg.addColorStop(1, "#2a1846"); g.fillStyle = bg; g.fillRect(0, 0, W, H);
+  g.fillStyle = "#ffffff"; g.font = "800 64px 'Barlow Condensed', 'Arial Narrow', sans-serif"; g.fillText("RUTA A ", 70, 120);
+  g.fillStyle = "#ffc23c"; g.fillText("MEDIDA", 70 + g.measureText("RUTA A ").width, 120);
+  g.fillStyle = "rgba(255,255,255,.7)"; g.font = "500 32px Archivo, system-ui, sans-serif"; g.fillText(dateFmt(run.date, { weekday: "long", day: "numeric", month: "long" }), 70, 172);
+  // Ruta dibujada a escala.
+  const xs = rt.coords.map(c => c[0]), ys = rt.coords.map(c => c[1]), k = Math.cos(ys[0] * Math.PI / 180);
+  const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
+  const sc = Math.min(860 / ((maxX - minX) * k || 1e-6), 560 / ((maxY - minY) || 1e-6)), ox = 110 + (860 - (maxX - minX) * k * sc) / 2, oy = 230 + (560 - (maxY - minY) * sc) / 2;
+  const px = c => [ox + (c[0] - minX) * k * sc, oy + (maxY - c[1]) * sc];
+  g.lineCap = "round"; g.lineJoin = "round";
+  g.strokeStyle = "rgba(0,0,0,.35)"; g.lineWidth = 26; g.beginPath(); rt.coords.forEach((c, i) => { const q = px(c); if (i) g.lineTo(q[0], q[1]); else g.moveTo(q[0], q[1]); }); g.stroke();
+  g.lineWidth = 14; rt.bins.forEach(b => { g.strokeStyle = C(b.t); g.beginPath(); const a = px(b.a), z = px(b.b); g.moveTo(a[0], a[1]); g.lineTo(z[0], z[1]); g.stroke(); });
+  const s0 = px(rt.coords[0]); g.fillStyle = "#34d27b"; g.beginPath(); g.arc(s0[0], s0[1], 18, 0, 7); g.fill();
+  (rt.sights || []).forEach((s, i) => { const q = px([s.lon, s.lat]); g.fillStyle = "#ff5a36"; g.beginPath(); g.arc(q[0], q[1], 22, 0, 7); g.fill(); g.fillStyle = "#fff"; g.font = "700 26px Archivo, sans-serif"; g.textAlign = "center"; g.fillText(String(i + 1), q[0], q[1] + 9); g.textAlign = "left"; });
+  // Datos.
+  const bikeRun = run.sport === "bike", stats = [[t("cardRoute"), fmtKm(run.dist) + " km"], [t("cardTime"), fmtClock(run.time)], bikeRun ? [t("cardSpeed"), (run.dist / 1000 / (run.time / 3600)).toFixed(1) + " km/h"] : [t("cardPace"), fmtPace(run.time / (run.dist / 1000)) + " /km"]];
+  stats.forEach((s, i) => { const x = 70 + i * 330; g.fillStyle = "rgba(255,255,255,.65)"; g.font = "600 28px Archivo, sans-serif"; g.fillText(s[0].toUpperCase(), x, 880); g.fillStyle = "#fff"; g.font = "800 84px 'Barlow Condensed', 'Arial Narrow', sans-serif"; g.fillText(s[1], x, 965); });
+  if (L0.passed.length) {
+    g.fillStyle = "#ffc23c"; g.font = "700 30px Archivo, sans-serif"; g.fillText(t("cardPlaces").toUpperCase(), 70, 1050);
+    g.fillStyle = "#fff"; g.font = "500 34px Archivo, sans-serif";
+    L0.passed.slice(0, 4).forEach((s, i) => g.fillText((i + 1) + ". " + shortTitle(s.title).slice(0, 44), 70, 1105 + i * 50));
+  }
+  g.fillStyle = "rgba(255,255,255,.55)"; g.font = "500 26px Archivo, sans-serif"; g.fillText(location.host + location.pathname, 70, H - 50);
+  return new Promise(res => cv.toBlob(b => res(new File([b], "ruta-a-medida.png", { type: "image/png" })), "image/png"));
+}
+$("sumImage").addEventListener("click", async () => { if (S.lastRun) await shareFile(await makeCard(S.lastRun), "Ruta a Medida"); });
+
+// ================= Rutas compartidas y retos por link =================
+async function openSharedSights(main) {
+  const parts = main.split("lugares=")[1].split("_");
+  const lang = parts[0] === "en" ? "en" : "es", v = parts.slice(1).map(Number);
+  if (v.length < 9 || v.some(x => !isFinite(x))) return false;
+  S.wlang = lang;
+  if (v[0] > 0) { S.bikeType = BIKE_TYPES[v[0] - 1] || BIKE_TYPES[0]; setSport("bike", true); } else setSport("run", true);
+  S.km = v[1]; TYPES.forEach((x, i) => S.mix[x.k] = v[2 + i]); setMode("sights"); renderSetup();
+  setStart(v[6], v[7], "shared", t("sharedPoint")); map.setView([v[6], v[7]], 14);
+  showMsg(t("loadingShared"));
+  try {
+    const ids = v.slice(8);
+    const j = await getJSON(wapi(lang) + "action=query&prop=coordinates&pageids=" + ids.join("%7C"));
+    const pages = (j.query && j.query.pages) || {};
+    const set = ids.map(id => pages[id]).filter(p => p && p.coordinates).map(p => ({ id: p.pageid, title: p.title, lat: p.coordinates[0].lat, lon: p.coordinates[0].lon }));
+    S.routes = [await fetchVia({ set, perim: 1 })]; S.opt = 0;
+    showMsg(S.challenge ? "" : t("sharedReady")); showResult(true); await loadSightInfo();
+  } catch (e) { showMsg(errText(e.status || 0), true); }
+  return true;
+}
 async function openShared() {
-  if (location.hash.indexOf("lugares=") >= 0) return openSharedSights();
-  const m = location.hash.split("ruta=")[1]; if (!m) return false;
+  const parts = location.hash.split("&reto="), main = parts[0];
+  if (parts[1]) {
+    const c = parts[1].split("_"), time = +c[c.length - 1], name = decodeURIComponent(c.slice(0, -1).join("_")).slice(0, 20);
+    if (isFinite(time) && time > 0) S.challenge = { name: name || t("aFriend"), time };
+  }
+  const showChallenge = () => { if (S.challenge && S.routes.length) { $("challengeBox").hidden = false; $("challengeBox").innerHTML = t("challengeBox", esc(S.challenge.name), fmtKm(S.routes[0].total), fmtClock(S.challenge.time)); } };
+  if (main.indexOf("lugares=") >= 0) { const ok = await openSharedSights(main); showChallenge(); return ok; }
+  const m = main.split("ruta=")[1]; if (!m) return false;
   const v = m.split("_").map(Number); if (v.length < 11 || v.some(x => !isFinite(x))) return false;
   if (v[11] > 0) { S.bikeType = BIKE_TYPES[v[11] - 1] || BIKE_TYPES[0]; setSport("bike", true); } else setSport("run", true);
-  S.km = v[2]; TYPES.forEach((t, i) => S.mix[t.k] = v[3 + i]); setMode(v[7] === 1 ? "quiet" : "normal"); renderSetup();
-  setStart(v[0], v[1], "shared", "punto de la ruta compartida");
+  S.km = v[2]; TYPES.forEach((x, i) => S.mix[x.k] = v[3 + i]); S.quiet = v[7] === 1; setMode("train"); renderSetup();
+  setStart(v[0], v[1], "shared", t("sharedPoint"));
   map.setView([v[0], v[1]], 15);
-  showMsg("Cargando la ruta que te compartieron…");
-  try { S.routes = [await fetchLoop(v[8], v[9], v[10])]; S.opt = 0; showMsg("Esta es la ruta que te compartieron."); showResult(true); }
+  showMsg(t("loadingShared"));
+  try { S.routes = [await fetchLoop(v[8], v[9], v[10])]; S.opt = 0; showMsg(S.challenge ? "" : t("sharedReady")); showResult(true); showChallenge(); }
   catch (e) { showMsg(errText(e.status), true); }
   return true;
 }
