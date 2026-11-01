@@ -1,0 +1,16 @@
+{
+  "name": "Ruta a Medida",
+  "short_name": "Ruta a Medida",
+  "description": "Rutas para correr cerca de ti con tu distancia exacta y tu mezcla de terreno.",
+  "lang": "es",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#14213d",
+  "theme_color": "#14213d",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
