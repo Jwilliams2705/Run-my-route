@@ -31,12 +31,12 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--sun); outli
 .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--muted); flex: none }
 .dot.on { background: #34d27b; box-shadow: 0 0 0 4px rgba(52,210,123,.25) }
 .gps button { margin-left: auto; border: 0; background: var(--bg2); border-radius: 10px; padding: 6px 10px; font-size: 12px; font-weight: 700; flex: none }
-main { padding: 16px max(16px, env(safe-area-inset-right, 0px)) calc(28px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); display: grid; gap: 18px; max-width: 640px; margin: 0 auto }
+main { padding: 16px max(16px, env(safe-area-inset-right, 0px)) calc(28px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; max-width: 640px; margin: 0 auto }
 .h { font-family: var(--f-display); text-transform: uppercase; letter-spacing: .06em; font-weight: 700; font-size: 15px; color: var(--muted); display: flex; justify-content: space-between; align-items: center; gap: 8px }
 .sec { display: grid; gap: 10px }
 .kmbox { display: flex; align-items: center; gap: 8px; background: var(--card); border: 2px solid var(--line); border-radius: 18px; padding: 6px 8px 6px 16px }
 .kmbox:focus-within { border-color: var(--accent) }
-.kmbox input { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--ink); font-family: var(--f-display); font-weight: 800; font-size: 44px; padding: 0 }
+.kmbox input { flex: 1; min-width: 0; width: 100%; border: 0; background: transparent; color: var(--ink); font-family: var(--f-display); font-weight: 800; font-size: 44px; padding: 0 }
 .kmbox input:focus { outline: none } .kmbox small { font-family: var(--f-display); font-weight: 700; font-size: 22px; color: var(--muted) }
 .step { width: 40px; height: 40px; border-radius: 12px; border: 0; background: var(--bg2); font-size: 22px; font-weight: 700 }
 .trow { display: grid; grid-template-columns: 12px minmax(0,1fr) auto; align-items: center; gap: 10px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 10px 12px }
@@ -71,14 +71,27 @@ dialog p { font-size: 14px } dialog a { color: var(--accent) }
 .row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px }
 .ghost { border: 2px solid var(--line); background: transparent; border-radius: 12px; padding: 8px 14px; font-weight: 700 }
 [hidden] { display: none !important }
+.errbox { overflow-wrap: anywhere; margin: 0; padding: 10px 14px; background: var(--bad); color: #fff; font-size: 13px }
 </style>
+<script>
+function showErr(msg) {
+  if (!document.body) { document.addEventListener("DOMContentLoaded", function () { showErr(msg); }); return; }
+  var b = document.getElementById("errbox");
+  if (!b) { b = document.createElement("p"); b.id = "errbox"; b.className = "errbox"; document.body.prepend(b); }
+  b.textContent = "Error: " + msg;
+}
+window.addEventListener("error", function (e) {
+  if (e.target && e.target.tagName && e.target.tagName !== "SCRIPT") return;
+  showErr(e.message || (e.target && (e.target.src || e.target.href)) || "desconocido");
+}, true);
+</script>
 </head>
 <body>
 <header class="top">
   <h1>Ruta a <span>Medida</span></h1>
   <button class="icon-btn" id="openCfg" type="button">Configurar</button>
 </header>
-<div id="map"></div>
+<div id="map"><p id="noMap" style="margin:0;padding:24px 20px;font-size:15px;line-height:1.5;color:var(--ink)"><b>El mapa no cargó.</b><br>Esta vista no puede abrir la app. Ábrela en Safari o Chrome desde https://jwilliams2705.github.io/Run-my-route/</p></div>
 <div class="gps">
   <span class="dot" id="gpsDot"></span>
   <span><b id="gpsTitle">Buscando tu ubicación…</b><small id="gpsSub">Permite el acceso al GPS cuando el teléfono lo pida.</small></span>
@@ -145,11 +158,15 @@ const store = { get: k => { try { return localStorage.getItem(k) } catch { retur
 const getKey = () => store.get("ors_key") || DEFAULT_KEY;
 
 // ---------- Mapa y GPS ----------
+$("noMap").remove();
 const map = L.map("map", { zoomControl: false }).setView([25.651, -100.290], 14);
-L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+const osm = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' });
+const carto = L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
   maxZoom: 19, subdomains: "abcd",
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
 }).addTo(map);
+let tileErrors = 0;
+carto.on("tileerror", () => { if (++tileErrors === 3) { map.removeLayer(carto); osm.addTo(map); } });
 const meIcon = L.divIcon({ className: "", html: '<div style="width:18px;height:18px;border-radius:50%;background:#34d27b;border:3px solid #fff;box-shadow:0 0 0 6px rgba(52,210,123,.3)"></div>', iconSize: [18, 18] });
 let meMarker = null, watchId = null, followGps = true;
 
