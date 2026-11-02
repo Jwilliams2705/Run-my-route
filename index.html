@@ -161,6 +161,28 @@ dialog .check { display: flex; gap: 8px; align-items: center; font-weight: 600 }
 .wxtop small { display: block; opacity: .92; font-size: 13px }
 .wx ul { margin: 0; padding-left: 18px; font-size: 13px; display: grid; gap: 2px }
 .wx p { margin: 0; font-size: 13px }
+.week { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none }
+.day { flex: 0 0 62px; border: 2px solid var(--line); background: var(--card); border-radius: 14px; padding: 6px 3px; display: grid; justify-items: center; gap: 1px }
+.day small { font-size: 11px; color: var(--muted); text-transform: capitalize }
+.day b { font-family: var(--f-display); font-size: 22px; line-height: 1 }
+.day i { font-style: normal; font-size: 10px; font-weight: 700; color: var(--muted); max-width: 56px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.day.has { background: color-mix(in srgb, var(--sun) 32%, var(--card)) } .day.has i { color: var(--ink) }
+.day.rest { background: color-mix(in srgb, var(--ondulado) 16%, var(--card)) }
+.day.done { background: color-mix(in srgb, var(--plano) 30%, var(--card)) }
+.day.sel { border-color: var(--accent); box-shadow: 0 6px 14px -8px rgba(255,90,54,.8) }
+.dayhead { display: flex; justify-content: space-between; align-items: center; gap: 8px } .dayhead b { font-size: 15px }
+.wcard { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 12px; display: grid; gap: 6px }
+.wcard.done { border-color: var(--plano) }
+.wtop { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap } .wwx { font-size: 13px; color: var(--muted) }
+.wprep summary { cursor: pointer; margin-bottom: 4px }
+.wadv { margin: 0; padding-left: 18px; font-size: 13px; display: grid; gap: 2px } .wbest, .wprep { margin: 0; font-size: 13px }
+.wbtns { display: flex; gap: 6px; flex-wrap: wrap } .wbtns .ghost { padding: 7px 10px; font-size: 13px }
+.histbtn { border: 0; border-radius: 12px; padding: 8px 12px; font: 700 13px var(--f-body); background: #fff; color: #14213d; box-shadow: 0 2px 8px rgba(0,0,0,.25); cursor: pointer }
+.histbtn.on { background: linear-gradient(90deg, #b14dff, #ff4fd8); color: #fff }
+.histline { filter: drop-shadow(0 0 5px #d98bff) }
+.placemark { width: 22px; height: 22px; border-radius: 50%; background: linear-gradient(135deg, #b14dff, #ff4fd8); color: #fff; border: 2px solid #fff; font: 800 12px/18px var(--f-body); text-align: center; box-shadow: 0 0 10px #d98bff }
+.endmark { width: 30px; height: 30px; border-radius: 50%; background: #fff; border: 3px solid #14213d; font-size: 15px; line-height: 24px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,.3) }
+dialog input[type=date], dialog input[type=time], dialog input[type=number] { width: 100%; border: 2px solid var(--line); border-radius: 12px; padding: 10px; font-family: var(--f-body); font-size: 14px; background: var(--bg); color: var(--ink) }
 .wx button { border: 0; background: rgba(255,255,255,.2); color: #fff; border-radius: 10px; padding: 6px 10px; font-size: 12px; font-weight: 700; margin-left: auto; flex: none }
 [hidden] { display: none !important }
 .errbox { overflow-wrap: anywhere; margin: 0; padding: 10px 14px; background: var(--bad); color: #fff; font-size: 13px }
@@ -201,6 +223,11 @@ window.addEventListener("error", function (e) {
   <p class="tip" id="tip" hidden><span data-t="tip"></span> <button type="button" class="linkbtn" id="tipClose" data-t="gotIt"></button></p>
   <p class="challenge" id="challengeBox" hidden></p>
   <section class="wx" id="wx" hidden></section>
+  <section class="sec" id="planSec">
+    <div class="h"><span data-t="planTitle"></span><span style="display:flex;gap:12px"><button type="button" class="linkbtn" id="planSuggest" data-t="planSuggest"></button><button type="button" class="linkbtn" id="planIcs" data-t="planIcs"></button></span></div>
+    <div class="week" id="week"></div>
+    <div class="sec" id="dayBox"></div>
+  </section>
 
   <section class="sec">
     <div class="h"><span data-t="howTitle"></span></div>
@@ -209,7 +236,19 @@ window.addEventListener("error", function (e) {
       <button type="button" class="mcard" data-m="train" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="#2f8cff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6M12 2v3"/></svg><b data-t="mTrain"></b><small data-t="mTrainSub"></small></button>
     </div>
     <label class="qtoggle" id="quietWrap" hidden><input type="checkbox" id="quietChk"> <span data-t="quietLbl"></span></label>
+    <div class="seg2" id="explore" hidden><button type="button" data-x="new" data-t="exNew"></button><button type="button" data-x="repeat" data-t="exRepeat"></button></div>
+    <p class="note" id="histNote" hidden></p>
     <p class="note" id="modeNote"></p>
+  </section>
+
+  <section class="sec">
+    <div class="h"><span data-t="endTitle"></span></div>
+    <div class="seg2" id="endMode"><button type="button" data-e="loop" aria-pressed="true" data-t="endLoop"></button><button type="button" data-e="point" aria-pressed="false" data-t="endPoint"></button></div>
+    <div class="sec" id="endBox" hidden>
+      <div class="search"><input id="q2" type="search" autocomplete="off" data-tp="endPh" data-ta="endPh"><ul class="qres" id="qres2" hidden></ul></div>
+      <div class="chips" id="tapFor"><span class="note" style="align-self:center" data-t="tapLbl"></span><button type="button" class="chip" data-f="start" data-t="tapStart"></button><button type="button" class="chip" data-f="end" data-t="tapEnd"></button></div>
+      <p class="note" id="endNote"></p>
+    </div>
   </section>
 
   <section class="sec">
@@ -310,6 +349,19 @@ window.addEventListener("error", function (e) {
   <div class="row"><button type="button" class="ghost" id="savedClose" data-t="close"></button></div>
 </dialog>
 
+<dialog id="planDlg">
+  <h2 id="pTitle"></h2>
+  <label for="pType" data-t="pType"></label>
+  <select id="pType"></select>
+  <label for="pDate" data-t="pDay"></label>
+  <input id="pDate" type="date">
+  <label for="pTime" data-t="pTime"></label>
+  <input id="pTime" type="time" value="07:00">
+  <label for="pKm" data-t="pKm"></label>
+  <input id="pKm" type="number" min="1" max="200" step="0.5" inputmode="decimal">
+  <div class="row wrap"><button type="button" class="ghost" id="pDel" data-t="del"></button><button type="button" class="ghost" id="pCancel" data-t="cancel"></button><button type="button" class="cta" style="font-size:16px;padding:8px 16px" id="pSave" data-t="save"></button></div>
+</dialog>
+
 <dialog id="summary">
   <h2 data-t="sumTitle"></h2>
   <p class="challenge" id="sumGhost" hidden></p>
@@ -377,7 +429,21 @@ const I = {
     wxStorm: "Hay tormenta eléctrica cerca. Mejor no salgas ahora.", wxRain1: "Probable lluvia: el piso resbala, sobre todo en bajadas y en la pintura de la calle.", wxRainBike: "Probable lluvia: frena antes y evita la pintura y las alcantarillas.",
     wxHot: "Mucho calor (se siente {0}°): baja el ritmo, busca sombra y lleva agua.", wxWarm: "Hace calor: toma agua antes y durante la ruta.", wxCold: "Hace frío: sal con capas y calienta bien antes de empezar.",
     wxUvHigh: "Sol muy fuerte (UV {0}): usa bloqueador, gorra y lentes.", wxWindy: "Viento fuerte ({0} km/h): cuidado con las ráfagas.", wxFog: "Hay neblina: usa ropa de colores que se vean.", wxGood: "Buen clima para salir.",
-    wxBest: "Mejor hora para salir hoy: <b>{0}</b> (se siente {1}°, lluvia {2}%).", wxNote: "Clima: {0}°, se siente {1}°.", wxAdj: " Tiempo ajustado +{0}% por el clima.", wxWater: " Agua sugerida: ~{0} ml.", vWx: "Hay {0} grados y se sienten {1}."
+    wxBest: "Mejor hora para salir hoy: <b>{0}</b> (se siente {1}°, lluvia {2}%).", wxNote: "Clima: {0}°, se siente {1}°.", wxAdj: " Tiempo ajustado +{0}% por el clima.", wxWater: " Agua sugerida: ~{0} ml.", vWx: "Hay {0} grados y se sienten {1}.",
+    myZones: "Mis zonas", exNew: "Lugares nuevos", exRepeat: "Volver a pasar", histNote: "Llevas {0} km en {1} y conoces {2}. Lo morado en el mapa es por donde ya pasaste.", out1: "1 salida", outN: "{0} salidas", freshPct: "{0}% nuevo", freshNote: "Nuevo para ti: {0}% de la ruta", visitedN: "visitado {0} veces",
+    endTitle: "¿Dónde terminas?", endLoop: "Donde empecé", endPoint: "En otro lugar", endPh: "Busca tu meta: casa, hotel, parque", tapLbl: "Tocar el mapa elige:", tapStart: "Salida", tapEnd: "Meta",
+    endAt: "Meta: {0} · a {1} km en línea recta de la salida.", endChosen: "punto elegido", needEnd: "Elige tu meta: búscala o toca el mapa.", endTooFar: "Tu meta está a {0} km en línea recta. Pide al menos {1} km.", vArrived: "Llegaste a tu meta. Excelente trabajo.", sharedEnd: "meta de la ruta compartida",
+    planTitle: "Mi plan de entreno", planSuggest: "Sugerir semana", planIcs: "Al calendario", today: "Hoy", tomorrow: "Mañana", addWorkout: "+ Agregar", freeDay: "Día libre. Toca + Agregar para programar un entreno o un descanso.",
+    w_easy: "Rodaje suave", w_tempo: "Tempo", w_intervals: "Series", w_long: "Fondo largo", w_hills: "Cuestas", w_bike: "Bici", w_rest: "Descanso",
+    noForecast: "Pronóstico aún no disponible", betterHour: "Mejor hora ese día: {0} (se siente {1}°).", moveThere: "Cambiar a esa hora", prepTitle: "Para la noche anterior:", restTitle: "Recomendación:",
+    makeRoute: "Crear la ruta", edit: "Editar", toCalendar: "Calendario", newWorkout: "Nuevo entreno", editWorkout: "Editar entreno", pType: "Tipo", pDay: "Día", pTime: "Hora", pKm: "Kilómetros",
+    planReady: "Listo: {0} de {1} km. Revisa tu terreno y toca Crear mi ruta.", icsEve: "Mañana: {0} a las {1}. Deja lista tu ropa y descansa.", icsSoon: "Tu entreno empieza en 1 hora.",
+    tip_easy: "Rodaje suave: ritmo cómodo, que puedas platicar.", tip_tempo: "Tempo: calienta 10 min y sostén un ritmo exigente pero constante.", tip_intervals: "Series: calienta 15 min y usa una ruta plana.", tip_long: "Fondo largo: lleva agua y algo de comer si pasas de 75 min.", tip_hills: "Cuestas: sube con pasos cortos y baja suave.", tip_bike: "Bici: revisa frenos, llantas y luces.",
+    prepEarly: "Sales temprano: deja la ropa lista desde la noche y desayuna algo ligero (plátano, pan).", prepNight: "Sales de noche: usa algo reflectante y prefiere calles iluminadas.", prepDay: "Come al menos 2 horas antes de salir.",
+    prepCarbs: "Cena con carbohidratos (pasta, arroz) y duerme de 7 a 9 horas.", prepSleep: "Toma agua durante el día y duerme de 7 a 9 horas.", gear: "Ropa: {0}.", gRain: "chamarra ligera y gorra", gHot: "ropa ligera, gorra, lentes y bloqueador", gCold: "capas y guantes", gNight: "algo reflectante o una luz", gNormal: "ropa cómoda",
+    lPrevHard: "El día anterior también es fuerte: hazlo más suave o muévelo para descansar.", lNextHard: "Al día siguiente también hay entreno fuerte: no te vacíes hoy.", lDouble: "Doble sesión: deja al menos 6 horas entre las dos y come en medio.",
+    lRestGood: "Buen momento para descansar después del esfuerzo.", lTooMuch: "Muchos días fuertes juntos: considera cambiar uno por rodaje suave.", pRest: "Descanso: estira o camina 15 a 20 min, toma agua y duerme bien.",
+    _: ""
   },
   en: {
     myRoutes: "My routes", settings: "Settings", offline: "No internet. You can still open your saved routes in My routes.",
@@ -433,7 +499,21 @@ const I = {
     wxStorm: "There's a thunderstorm nearby. Better not to go out now.", wxRain1: "Rain likely: the ground gets slippery, especially downhill and on road paint.", wxRainBike: "Rain likely: brake earlier and avoid road paint and drain covers.",
     wxHot: "Very hot (feels like {0}°): slow down, look for shade and carry water.", wxWarm: "It's warm: drink water before and during the route.", wxCold: "It's cold: wear layers and warm up well before you start.",
     wxUvHigh: "Very strong sun (UV {0}): use sunscreen, a cap and sunglasses.", wxWindy: "Strong wind ({0} km/h): watch out for gusts.", wxFog: "It's foggy: wear bright, visible clothes.", wxGood: "Good weather to go out.",
-    wxBest: "Best time to go today: <b>{0}</b> (feels like {1}°, rain {2}%).", wxNote: "Weather: {0}°, feels like {1}°.", wxAdj: " Time adjusted +{0}% for the weather.", wxWater: " Suggested water: ~{0} ml.", vWx: "It's {0} degrees and feels like {1}."
+    wxBest: "Best time to go today: <b>{0}</b> (feels like {1}°, rain {2}%).", wxNote: "Weather: {0}°, feels like {1}°.", wxAdj: " Time adjusted +{0}% for the weather.", wxWater: " Suggested water: ~{0} ml.", vWx: "It's {0} degrees and feels like {1}.",
+    myZones: "My zones", exNew: "New places", exRepeat: "Go back", histNote: "You've done {0} km in {1} and discovered {2}. Purple on the map is where you've already been.", out1: "1 outing", outN: "{0} outings", freshPct: "{0}% new", freshNote: "New to you: {0}% of the route", visitedN: "visited {0} times",
+    endTitle: "Where do you finish?", endLoop: "Where I started", endPoint: "Somewhere else", endPh: "Search your finish: home, hotel, park", tapLbl: "Tapping the map sets:", tapStart: "Start", tapEnd: "Finish",
+    endAt: "Finish: {0} · {1} km in a straight line from the start.", endChosen: "chosen point", needEnd: "Choose your finish: search it or tap the map.", endTooFar: "Your finish is {0} km away in a straight line. Ask for at least {1} km.", vArrived: "You've reached your finish. Great job.", sharedEnd: "shared route finish",
+    planTitle: "My training plan", planSuggest: "Suggest a week", planIcs: "To calendar", today: "Today", tomorrow: "Tomorrow", addWorkout: "+ Add", freeDay: "Free day. Tap + Add to schedule a workout or a rest day.",
+    w_easy: "Easy run", w_tempo: "Tempo", w_intervals: "Intervals", w_long: "Long run", w_hills: "Hills", w_bike: "Bike", w_rest: "Rest",
+    noForecast: "Forecast not available yet", betterHour: "Better time that day: {0} (feels like {1}°).", moveThere: "Move to that time", prepTitle: "For the night before:", restTitle: "Tip:",
+    makeRoute: "Create the route", edit: "Edit", toCalendar: "Calendar", newWorkout: "New workout", editWorkout: "Edit workout", pType: "Type", pDay: "Day", pTime: "Time", pKm: "Kilometers",
+    planReady: "Ready: {0}, {1} km. Check your terrain and tap Create my route.", icsEve: "Tomorrow: {0} at {1}. Get your clothes ready and rest.", icsSoon: "Your workout starts in 1 hour.",
+    tip_easy: "Easy run: comfortable pace, you should be able to talk.", tip_tempo: "Tempo: warm up 10 min and hold a hard but steady pace.", tip_intervals: "Intervals: warm up 15 min and use a flat route.", tip_long: "Long run: carry water and a snack if it goes past 75 min.", tip_hills: "Hills: short steps uphill, easy on the way down.", tip_bike: "Bike: check brakes, tires and lights.",
+    prepEarly: "Early start: lay out your clothes the night before and eat something light (banana, toast).", prepNight: "Going at night: wear something reflective and stick to lit streets.", prepDay: "Eat at least 2 hours before you go.",
+    prepCarbs: "Have a carb-rich dinner (pasta, rice) and sleep 7 to 9 hours.", prepSleep: "Drink water through the day and sleep 7 to 9 hours.", gear: "Clothes: {0}.", gRain: "light jacket and cap", gHot: "light clothes, cap, sunglasses and sunscreen", gCold: "layers and gloves", gNight: "something reflective or a light", gNormal: "comfortable clothes",
+    lPrevHard: "The day before is also hard: go easier or move it to rest.", lNextHard: "The next day is also hard: don't empty the tank today.", lDouble: "Double session: leave at least 6 hours between them and eat in between.",
+    lRestGood: "Good time to rest after the effort.", lTooMuch: "Lots of hard days together: consider swapping one for an easy run.", pRest: "Rest: stretch or walk 15 to 20 min, drink water and sleep well.",
+    _: ""
   }
 };
 function t(k) { let s = I[LANG][k]; if (s === undefined) s = I.es[k]; if (s === undefined) s = k; for (let i = 1; i < arguments.length; i++) s = s.split("{" + (i - 1) + "}").join(arguments[i]); return s; }
@@ -471,6 +551,7 @@ const getKey = () => rawKey() || DEFAULT_KEY;
 const S = {
   km: 8, mix: { plano: 70, ondulado: 20, subida: 5, bajada: 5 }, quiet: store.get("rm_quiet", false), routeMode: "sights", sightInfo: {}, wlang: LANG,
   start: null, here: null, routes: [], opt: 0, seedBase: 0, challenge: null,
+  endMode: "loop", end: null, tapFor: "start", explore: store.get("rm_explore", "new"), showHist: store.get("rm_hist", true), planDay: null, planUse: null,
   pace: store.get("rm_pace", 360), speed: store.get("rm_speed", 22), sport: store.get("rm_sport", "run"), bikeType: store.get("rm_bike", "cycling-regular"),
   voiceMode: store.get("rm_voicemode", store.get("rm_voice", true) ? "full" : "off"), name: store.get("rm_name", ""),
   run: null, follow: true
@@ -534,7 +615,8 @@ function analyze(coords) {
 function routeFrom(coords, extra) {
   const r = Object.assign({ coords, ascent: 0, busy: 0, foot: 0, steps: [] }, extra || {}, analyze(coords));
   if (!r.ascent) { let up = 0; for (let i = 1; i < coords.length; i++) { const d = (coords[i][2] || 0) - (coords[i - 1][2] || 0); if (d > 0) up += d; } r.ascent = up; }
-  r.rank = S.quiet ? r.match - r.busy : r.match;
+  r.fresh = novelty(r);
+  r.rank = (S.quiet ? r.match - r.busy : r.match) + freshBonus(r);
   return r;
 }
 // Indicaciones giro a giro: dónde empieza cada una sobre la ruta. Sin "sigue derecho", salida ni llegadas.
@@ -557,7 +639,16 @@ $("noMap").remove();
 const map = L.map("map", { zoomControl: false }).setView([25.651, -100.290], 14);
 L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' }).addTo(map);
 const dotIcon = (color, size) => L.divIcon({ className: "", html: '<div style="width:' + size + 'px;height:' + size + 'px;border-radius:50%;background:' + color + ';border:3px solid #fff;box-shadow:0 0 0 5px rgba(20,33,61,.25)"></div>', iconSize: [size, size] });
-let startMarker = null, hereMarker = null, routeLayer = null, cursor = null;
+let startMarker = null, hereMarker = null, routeLayer = null, cursor = null, endMarker = null, histLayer = null, histBtn = null;
+// Capa propia para lo ya corrido: queda debajo de las rutas nuevas.
+map.createPane("hist"); map.getPane("hist").style.zIndex = 390;
+const HistCtl = L.Control.extend({ onAdd() {
+  histBtn = L.DomUtil.create("button", "histbtn"); histBtn.type = "button"; histBtn.textContent = t("myZones");
+  L.DomEvent.disableClickPropagation(histBtn);
+  L.DomEvent.on(histBtn, "click", () => { S.showHist = !S.showHist; store.set("rm_hist", S.showHist); drawHistory(); });
+  return histBtn;
+} });
+new HistCtl({ position: "topright" }).addTo(map);
 
 function setStart(lat, lng, source, label) {
   S.start = { lat, lng };
@@ -565,8 +656,28 @@ function setStart(lat, lng, source, label) {
   $("gpsDot").classList.add("on");
   $("gpsTitle").textContent = source === "gps" ? t("fromGps") : label ? t("fromLabel", label) : t("startChosen");
   $("gpsSub").textContent = source === "gps" ? t("tapOrSearch") : t("tapToChange");
-  loadWeather(false);
+  loadWeather(false); loadPlanWeather(false);
+  if (S.end) renderEnd();
 }
+// ================= Meta: terminar donde empezaste o en otro lugar =================
+const oneWay = () => !!(S.endMode === "point" && S.end && S.start && haversine([S.start.lng, S.start.lat], [S.end.lng, S.end.lat]) > 150);
+const endPt = () => oneWay() ? S.end : S.start;
+function setEnd(lat, lng, label) {
+  S.end = { lat, lng, label: label || "" };
+  if (!endMarker) endMarker = L.marker([lat, lng], { zIndexOffset: 600, icon: L.divIcon({ className: "", html: '<div class="endmark">🏁</div>', iconSize: [30, 30] }) }).addTo(map); else endMarker.setLatLng([lat, lng]);
+  renderEnd();
+}
+function renderEnd() {
+  const pt = S.endMode === "point";
+  $("endMode").querySelectorAll("[data-e]").forEach(x => x.setAttribute("aria-pressed", String(x.dataset.e === S.endMode)));
+  $("endBox").hidden = !pt;
+  $("tapFor").querySelectorAll("[data-f]").forEach(x => x.setAttribute("aria-pressed", String(x.dataset.f === S.tapFor)));
+  if (endMarker) { if (pt) endMarker.addTo(map); else endMarker.remove(); }
+  $("endNote").textContent = !S.end ? t("needEnd") : t("endAt", S.end.label || t("endChosen"), S.start ? (haversine([S.start.lng, S.start.lat], [S.end.lng, S.end.lat]) / 1000).toFixed(1) : "?");
+}
+function setEndMode(m) { S.endMode = m === "point" ? "point" : "loop"; S.tapFor = S.endMode === "point" ? "end" : "start"; renderEnd(); }
+$("endMode").addEventListener("click", e => { const b = e.target.closest("[data-e]"); if (b) setEndMode(b.dataset.e); });
+$("tapFor").addEventListener("click", e => { const b = e.target.closest("[data-f]"); if (b) { S.tapFor = b.dataset.f; renderEnd(); } });
 
 // ================= GPS =================
 let watchId = null, gpsFirst = true;
@@ -587,40 +698,40 @@ function locate(recenter) {
     $("gpsSub").textContent = t("searchOrTap");
   }, { enableHighAccuracy: true, maximumAge: 5000, timeout: 30000 });
 }
-map.on("click", e => { if (S.run) return; setStart(e.latlng.lat, e.latlng.lng, "manual"); });
+map.on("click", e => { if (S.run) return; if (S.endMode === "point" && S.tapFor === "end") setEnd(e.latlng.lat, e.latlng.lng, ""); else setStart(e.latlng.lat, e.latlng.lng, "manual"); });
 $("locate").addEventListener("click", () => {
   if (S.here) { setStart(S.here.lat, S.here.lng, "gps"); map.setView([S.here.lat, S.here.lng], 15); }
   else locate(true);
 });
 
 // ================= Buscador de lugares =================
-let qTimer = null, qSeq = 0;
-$("q").addEventListener("input", () => {
-  clearTimeout(qTimer);
-  const text = $("q").value.trim();
-  if (text.length < 3) { $("qres").hidden = true; return; }
-  qTimer = setTimeout(async () => {
-    const my = ++qSeq, c = map.getCenter();
-    try {
-      const url = ORS + "/geocode/autocomplete?api_key=" + encodeURIComponent(getKey()) + "&text=" + encodeURIComponent(text) + "&focus.point.lon=" + c.lng.toFixed(4) + "&focus.point.lat=" + c.lat.toFixed(4) + "&size=5";
-      const j = await fetch(url).then(r => r.json());
-      if (my !== qSeq) return;
-      const fs = (j.features || []);
-      $("qres").innerHTML = fs.length ? fs.map((f, i) => '<li><button type="button" data-i="' + i + '">' + esc(f.properties.label) + '</button></li>').join("") : '<li class="note" style="padding:8px 10px">' + t("noPlace") + '</li>';
-      $("qres")._f = fs;
-      $("qres").hidden = false;
-    } catch (e) {
-      $("qres").innerHTML = '<li class="note" style="padding:8px 10px">' + t("searchFail") + '</li>'; $("qres").hidden = false;
-    }
-  }, 350);
-});
-$("qres").addEventListener("click", e => {
-  const b = e.target.closest("[data-i]"); if (!b) return;
-  const f = $("qres")._f[+b.dataset.i], ll = f.geometry.coordinates;
-  setStart(ll[1], ll[0], "search", f.properties.name || f.properties.label);
-  map.setView([ll[1], ll[0]], 15);
-  $("qres").hidden = true; $("q").value = ""; $("q").blur();
-});
+function hookSearch(inp, list, pick) {
+  let timer = null, seq = 0;
+  inp.addEventListener("input", () => {
+    clearTimeout(timer);
+    const text = inp.value.trim();
+    if (text.length < 3) { list.hidden = true; return; }
+    timer = setTimeout(async () => {
+      const my = ++seq, c = map.getCenter();
+      try {
+        const url = ORS + "/geocode/autocomplete?api_key=" + encodeURIComponent(getKey()) + "&text=" + encodeURIComponent(text) + "&focus.point.lon=" + c.lng.toFixed(4) + "&focus.point.lat=" + c.lat.toFixed(4) + "&size=5";
+        const j = await fetch(url).then(r => r.json());
+        if (my !== seq) return;
+        const fs = (j.features || []);
+        list.innerHTML = fs.length ? fs.map((f, i) => '<li><button type="button" data-i="' + i + '">' + esc(f.properties.label) + '</button></li>').join("") : '<li class="note" style="padding:8px 10px">' + t("noPlace") + '</li>';
+        list._f = fs; list.hidden = false;
+      } catch (e) { list.innerHTML = '<li class="note" style="padding:8px 10px">' + t("searchFail") + '</li>'; list.hidden = false; }
+    }, 350);
+  });
+  list.addEventListener("click", e => {
+    const b = e.target.closest("[data-i]"); if (!b) return;
+    const f = list._f[+b.dataset.i], ll = f.geometry.coordinates;
+    pick(ll[1], ll[0], f.properties.name || f.properties.label);
+    list.hidden = true; inp.value = ""; inp.blur();
+  });
+}
+hookSearch($("q"), $("qres"), (lat, lng, name) => { setStart(lat, lng, "search", name); map.setView([lat, lng], 15); });
+hookSearch($("q2"), $("qres2"), (lat, lng, name) => { setEnd(lat, lng, name); map.setView([lat, lng], 15); });
 
 // ================= Formulario =================
 $("terr").innerHTML = TYPES.map(x => '<div class="trow" style="--c:var(--' + x.k + ')"><span class="sw"></span><span><b>' + x.name + '</b><small>' + x.desc + '</small></span>' +
@@ -691,10 +802,38 @@ async function fetchLoop(seed, points, factor) {
   const f = await orsRoute({ coordinates: [[S.start.lng, S.start.lat]], options: opts });
   return routeFromFeature(f, { seed, points, factor });
 }
+// Ruta de A a B con la distancia pedida: pasa por un punto intermedio sobre una elipse entre la salida y la meta.
+async function fetchAB(theta, P) {
+  const A = [S.start.lng, S.start.lat], B = [S.end.lng, S.end.lat], kx = Math.cos(A[1] * Math.PI / 180) * 111320, ky = 110540;
+  const bx = (B[0] - A[0]) * kx, by = (B[1] - A[1]) * ky, c = Math.hypot(bx, by), ux = bx / c, uy = by / c;
+  const a = Math.max(P, c * 1.05) / 2, b = Math.sqrt(Math.max(1, a * a - c * c / 4));
+  const wx = bx / 2 + a * Math.cos(theta) * ux - b * Math.sin(theta) * uy, wy = by / 2 + a * Math.cos(theta) * uy + b * Math.sin(theta) * ux;
+  const W = [A[0] + wx / kx, A[1] + wy / ky], wps = [A, W, B], body = { coordinates: wps };
+  if (S.quiet && !bike()) body.options = { avoid_features: ["steps"], profile_params: { weightings: { quiet: 1, green: 1 } } };
+  const f = await orsRoute(body);
+  return routeFromFeature(f, { straight: haversine(A, W) + haversine(W, B), wps, theta });
+}
+async function createOneWay() {
+  const L = S.km * 1000, off = S.seedBase * .13, th = [90, -90, 60, -60, 120, -120].map(d => d * Math.PI / 180 + off);
+  let factor = bike() ? 1.25 : 1.3;
+  const rs = await Promise.allSettled(th.map(x => fetchAB(x, L / factor)));
+  let out = rs.filter(x => x.status === "fulfilled").map(x => x.value);
+  if (!out.length) throw rs[0].reason;
+  // Ajusta con lo que de verdad midieron las calles y vuelve a intentar con las mejores direcciones.
+  if (Math.min(...out.map(x => Math.abs(x.total - L) / L)) > .08) {
+    factor = out.reduce((a, x) => a + x.total / x.straight, 0) / out.length;
+    const best = out.slice().sort((a, b) => b.rank - a.rank).slice(0, 4).map(x => x.theta);
+    out = out.concat((await Promise.allSettled(best.map(x => fetchAB(x, L / factor)))).filter(x => x.status === "fulfilled").map(x => x.value));
+  }
+  const near = out.filter(x => Math.abs(x.total - L) / L < .15);
+  return near.length ? near : out.sort((a, b) => Math.abs(a.total - L) - Math.abs(b.total - L)).slice(0, 3);
+}
 function showMsg(text, isErr) { $("msg").hidden = !text; $("msg").innerHTML = text || ""; $("msg").classList.toggle("err", !!isErr); }
 function errText(st) { return st === 0 ? t("errNet") : st === 401 || st === 403 ? t("errKey") : st === 429 ? t("errLimit") : t("errNone"); }
 async function createRoutes() {
   if (!S.start) { showMsg(t("needStart"), true); return; }
+  if (S.endMode === "point" && !S.end) { showMsg(t("needEnd"), true); return; }
+  if (oneWay()) { const dd = haversine([S.start.lng, S.start.lat], [S.end.lng, S.end.lat]); if (dd > S.km * 900) { showMsg(t("endTooFar", (dd / 1000).toFixed(1), Math.ceil(dd * 1.35 / 1000)), true); return; } }
   const b = S.seedBase;
   // El servicio suele dar rutas más largas de lo pedido, así que pedimos un poco menos.
   const tries = bike() ? [[b + 1, 4, .8], [b + 2, 5, .84], [b + 3, 4, .88], [b + 4, 5, .82], [b + 5, 4, .86], [b + 6, 5, .92]]
@@ -707,8 +846,11 @@ async function createRoutes() {
   }
   if (!ok.length) {
     showMsg(note + t("findingRoutes"));
-    results = await Promise.allSettled(tries.map(([s, p, f]) => fetchLoop(s, p, f)));
-    ok = results.filter(r => r.status === "fulfilled").map(r => r.value);
+    if (oneWay()) { try { ok = await createOneWay(); } catch (e) { results = [{ reason: e }]; } }
+    else {
+      results = await Promise.allSettled(tries.map(([s, p, f]) => fetchLoop(s, p, f)));
+      ok = results.filter(r => r.status === "fulfilled").map(r => r.value);
+    }
   }
   $("go").dataset.busy = ""; $("go").textContent = t("go"); renderSetup();
   if (!ok.length) { const st = results.length && results[0].reason ? results[0].reason.status : 0; showMsg(errText(st), true); return; }
@@ -740,24 +882,26 @@ async function findSights(lat, lng, radius, lang) {
   let items = ((g.query && g.query.geosearch) || []).filter(i => (i.type ? SIGHT_TYPES[i.type] : lang === "en") && !NOT_PLACES.some(w => i.title.toLowerCase().indexOf(w) >= 0) && !/^X[EH][A-Z]/.test(i.title)).slice(0, 50);
   if (!items.length) return [];
   const info = await getJSON(wapi(lang) + "action=query&prop=info&pageids=" + items.map(i => i.pageid).join("%7C"));
-  const len = {}; Object.values((info.query && info.query.pages) || {}).forEach(p => len[p.pageid] = p.length || 0);
-  items = items.map(i => ({ id: i.pageid, title: i.title, lat: i.lat, lon: i.lon, score: Math.log10(1000 + (len[i.pageid] || 0)) + (i.type === "landmark" ? .3 : 0) })).sort((a, b) => b.score - a.score);
+  const len = {}, seenP = store.get("rm_places", {}); Object.values((info.query && info.query.pages) || {}).forEach(p => len[p.pageid] = p.length || 0);
+  items = items.map(i => ({ id: i.pageid, title: i.title, lat: i.lat, lon: i.lon, score: Math.log10(1000 + (len[i.pageid] || 0)) + (i.type === "landmark" ? .3 : 0) + (seenP[lang + ":" + i.pageid] ? (S.explore === "repeat" ? 1.5 : -3) : 0) })).sort((a, b) => b.score - a.score);
   const out = [];
   // Sin lugares pegados a la salida (ya estás ahí) ni repetidos a menos de 120 m.
-  items.forEach(i => { if (haversine([lng, lat], [i.lon, i.lat]) > 250 && !out.some(o => haversine([o.lon, o.lat], [i.lon, i.lat]) < 120)) out.push(i); });
+  items.forEach(i => { if (haversine([S.start.lng, S.start.lat], [i.lon, i.lat]) > 250 && haversine([endPt().lng, endPt().lat], [i.lon, i.lat]) > 250 && !out.some(o => haversine([o.lon, o.lat], [i.lon, i.lat]) < 120)) out.push(i); });
   return out.slice(0, 20);
 }
 // Elige grupos de 1 a 4 lugares que, unidos en una vuelta, den más o menos la distancia pedida.
 function pickLoops(sights, L, factor, avoid) {
-  const st = S.start, s0 = [st.lng, st.lat], target = L / factor, rnd = rng(7 + L + S.seedBase * 31);
-  const ang = s => Math.atan2(s.lat - st.lat, (s.lon - st.lng) * Math.cos(st.lat * Math.PI / 180));
-  const perim = set => { let p = 0, prev = s0; set.forEach(s => { const c = [s.lon, s.lat]; p += haversine(prev, c); prev = c; }); return p + haversine(prev, s0); };
+  const st = S.start, en = endPt(), s0 = [st.lng, st.lat], s1 = [en.lng, en.lat], target = L / factor, rnd = rng(7 + L + S.seedBase * 31), kx = Math.cos(st.lat * Math.PI / 180);
+  const ang = s => Math.atan2(s.lat - st.lat, (s.lon - st.lng) * kx);
+  // De ida (A a B): los lugares en orden de avance hacia la meta.
+  const along = s => (s.lon - st.lng) * kx * (en.lng - st.lng) * kx + (s.lat - st.lat) * (en.lat - st.lat);
+  const perim = set => { let p = 0, prev = s0; set.forEach(s => { const c = [s.lon, s.lat]; p += haversine(prev, c); prev = c; }); return p + haversine(prev, s1); };
   const n = sights.length, seen = {}, cands = [];
   for (let k0 = 0; k0 < 600 && n; k0++) {
     const k = 1 + Math.floor(rnd() * Math.min(4, n)), set = [];
     while (set.length < k) { const s = sights[Math.floor(rnd() * n)]; if (set.indexOf(s) < 0) set.push(s); }
     // En orden alrededor de la salida, para que la vuelta no se cruce.
-    set.sort((a, b) => ang(a) - ang(b));
+    set.sort(oneWay() ? (a, b) => along(a) - along(b) : (a, b) => ang(a) - ang(b));
     const key = set.map(s => s.id).sort().join(",");
     if (seen[key] || avoid[key]) continue;
     seen[key] = 1;
@@ -777,19 +921,19 @@ function placeSights(r, set) {
   }).sort((a, b) => a.along - b.along);
 }
 async function fetchVia(pick) {
-  const s0 = [S.start.lng, S.start.lat];
-  const f = await orsRoute({ coordinates: [s0].concat(pick.set.map(s => [s.lon, s.lat]), [s0]) });
-  const r = routeFromFeature(f, { straight: pick.perim });
+  const s0 = [S.start.lng, S.start.lat], e = endPt(), wps = [s0].concat(pick.set.map(s => [s.lon, s.lat]), [[e.lng, e.lat]]);
+  const f = await orsRoute({ coordinates: wps });
+  const r = routeFromFeature(f, { straight: pick.perim, wps });
   r.sights = placeSights(r, pick.set);
-  r.rank = r.match + 6 * r.sights.length;
+  r.rank = r.match + 6 * r.sights.length + freshBonus(r);
   return r;
 }
 async function createSightRoutes() {
   showMsg(t("findingPlaces"));
-  const L = S.km * 1000, other = LANG === "es" ? "en" : "es";
+  const L = S.km * 1000, other = LANG === "es" ? "en" : "es", E = endPt(), cLat = (S.start.lat + E.lat) / 2, cLng = (S.start.lng + E.lng) / 2;
   // Primero en el idioma del teléfono; si hay pocos lugares, también en el otro idioma.
-  let sights = await findSights(S.start.lat, S.start.lng, L * .45, LANG); S.wlang = LANG;
-  if (sights.length < 4) { const o = await findSights(S.start.lat, S.start.lng, L * .45, other).catch(() => []); if (o.length > sights.length) { sights = o; S.wlang = other; } }
+  let sights = await findSights(cLat, cLng, L * .45, LANG); S.wlang = LANG;
+  if (sights.length < 4) { const o = await findSights(cLat, cLng, L * .45, other).catch(() => []); if (o.length > sights.length) { sights = o; S.wlang = other; } }
   if (!sights.length) return [];
   showMsg(t("buildingVia", esc(shortTitle(sights[0].title))));
   let factor = bike() ? 1.25 : 1.3, out = [];
@@ -894,10 +1038,10 @@ function showResult(scroll) {
 }
 function renderResult() {
   const rt = S.routes[S.opt];
-  $("opts").innerHTML = S.routes.map((r, i) => '<button type="button" class="opt" data-o="' + i + '" aria-pressed="' + (i === S.opt) + '"><small>' + t("option", i + 1) + '</small><b>' + r.match + '%</b><small>' + fmtKm(r.total) + ' km' + (r.sights && r.sights.length ? ' · ' + r.sights.length + ' ' + t(r.sights.length === 1 ? "place1" : "placeN") : '') + '</small></button>').join("");
+  $("opts").innerHTML = S.routes.map((r, i) => '<button type="button" class="opt" data-o="' + i + '" aria-pressed="' + (i === S.opt) + '"><small>' + t("option", i + 1) + '</small><b>' + r.match + '%</b><small>' + fmtKm(r.total) + ' km' + (r.sights && r.sights.length ? ' · ' + r.sights.length + ' ' + t(r.sights.length === 1 ? "place1" : "placeN") : '') + (r.fresh != null ? ' · ' + t("freshPct", r.fresh) : '') + '</small></button>').join("");
   $("more").hidden = !!S.challenge || (S.routes.length < 2 && !rt.seed);
   $("stats").innerHTML = '<div class="stat"><span>' + t("distance") + '</span><b>' + fmtKm(rt.total) + ' km</b></div><div class="stat"><span>' + t("gain") + '</span><b>' + Math.round(rt.ascent) + ' m</b></div><div class="stat"><span>' + t("timeAt", bike() ? S.speed + ' km/h' : fmtPace(S.pace)) + '</span><b>' + fmtDur(estMinutes(rt)) + '</b></div>';
-  $("roads").textContent = t("bigRoads", rt.busy) + " · " + t(bike() ? "bikeways" : "footways", rt.foot);
+  $("roads").textContent = t("bigRoads", rt.busy) + " · " + t(bike() ? "bikeways" : "footways", rt.foot) + (rt.fresh != null ? " · " + t("freshNote", rt.fresh) : "");
   const wd = WX.data; $("wxNote").hidden = !wd;
   if (wd) { const f = Math.round((wxFactor() - 1) * 100), min = estMinutes(rt), ml = Math.round(min * (wd.feels >= 27 ? 12 : wd.feels >= 18 ? 8 : 5) / 50) * 50; $("wxNote").textContent = t("wxNote", Math.round(wd.temp), Math.round(wd.feels)) + (f >= 2 ? t("wxAdj", f) : "") + (min >= 25 ? t("wxWater", ml) : ""); }
   $("compare").innerHTML = TYPES.map(x => '<div class="crow" style="--c:var(--' + x.k + ')"><span>' + x.name + '</span><span class="bar"><i style="width:' + rt.real[x.k] + '%"></i></span><code>' + S.mix[x.k] + '% → ' + rt.real[x.k] + '%</code></div>').join("");
@@ -962,15 +1106,16 @@ $("profile").addEventListener("pointermove", e => { if (e.pointerType === "mouse
 function packRoute(rt, name) {
   return { id: Date.now(), name, date: new Date().toISOString(), km: S.km, mix: Object.assign({}, S.mix), quiet: S.quiet, routeMode: S.routeMode, sport: S.sport, bikeType: S.bikeType, start: S.start, seed: rt.seed || 0, points: rt.points || 0, factor: rt.factor || 0,
     ascent: Math.round(rt.ascent), busy: rt.busy, foot: rt.foot, coords: rt.coords.map(c => [+c[0].toFixed(5), +c[1].toFixed(5), Math.round(c[2] || 0)]), steps: rt.steps || [],
-    sights: rt.sights || null, wlang: S.wlang, info: rt.sights ? Object.fromEntries(rt.sights.map(s => [s.id, S.sightInfo[s.id] || null])) : null };
+    sights: rt.sights || null, wlang: S.wlang, endMode: oneWay() ? "point" : "loop", end: S.end, wps: rt.wps || null, info: rt.sights ? Object.fromEntries(rt.sights.map(s => [s.id, S.sightInfo[s.id] || null])) : null };
 }
 function openPacked(p) {
   if (p.bikeType) S.bikeType = p.bikeType;
   setSport(p.sport || "run", true); S.km = p.km; S.mix = Object.assign({}, p.mix); S.quiet = !!p.quiet; setMode(p.routeMode === "sights" ? "sights" : "train"); renderSetup();
   if (p.start) setStart(p.start.lat, p.start.lng, "saved", p.name);
+  if (p.endMode === "point" && p.end) { setEnd(p.end.lat, p.end.lng, p.end.label); setEndMode("point"); } else setEndMode("loop");
   if (p.info) Object.keys(p.info).forEach(k => { if (p.info[k]) S.sightInfo[k] = p.info[k]; });
   if (p.wlang) S.wlang = p.wlang;
-  S.routes = [routeFrom(p.coords, { ascent: p.ascent, busy: p.busy || 0, foot: p.foot || 0, seed: p.seed, points: p.points, factor: p.factor, sights: p.sights || null, steps: p.steps || [] })]; S.opt = 0;
+  S.routes = [routeFrom(p.coords, { ascent: p.ascent, busy: p.busy || 0, foot: p.foot || 0, seed: p.seed, points: p.points, factor: p.factor, sights: p.sights || null, steps: p.steps || [], wps: p.wps || null })]; S.opt = 0;
   showResult(true);
 }
 $("save").addEventListener("click", () => {
@@ -978,9 +1123,10 @@ $("save").addEventListener("click", () => {
   list.unshift(packRoute(rt, t("routeOf", fmtKm(rt.total)) + " · " + dateFmt(Date.now(), { day: "numeric", month: "short" })));
   showMsg(store.set("rm_saved", list.slice(0, 15)) ? t("savedOk") : t("saveFail"), false);
 });
-const canLink = rt => !!(rt.seed || (rt.sights && rt.sights.length));
+const canLink = rt => !!(rt.seed || (rt.sights && rt.sights.length) || (rt.wps && oneWay()));
 function shareUrl(rt) {
   const base = location.origin + location.pathname, bk = bike() ? BIKE_TYPES.indexOf(S.bikeType) + 1 : 0;
+  if (oneWay() && rt.wps) return base + "#via=" + [S.wlang, bk, S.km, S.mix.plano, S.mix.ondulado, S.mix.subida, S.mix.bajada, S.quiet ? 1 : 0, rt.wps.length].concat(rt.wps.flatMap(q => [q[1].toFixed(5), q[0].toFixed(5)]), (rt.sights || []).map(x => x.id)).join("_");
   if (rt.sights && rt.sights.length) return base + "#lugares=" + [S.wlang, bk, S.km, S.mix.plano, S.mix.ondulado, S.mix.subida, S.mix.bajada, S.start.lat.toFixed(5), S.start.lng.toFixed(5)].concat(rt.sights.map(s => s.id)).join("_");
   return base + "#ruta=" + [S.start.lat.toFixed(5), S.start.lng.toFixed(5), S.km, S.mix.plano, S.mix.ondulado, S.mix.subida, S.mix.bajada, S.quiet ? 1 : 0, rt.seed, rt.points, rt.factor, bk].join("_");
 }
@@ -1181,11 +1327,14 @@ function endRun(completed) {
   // Lugares por los que de verdad pasaste.
   const passed = (rt.sights || []).filter(s => s.along <= r.done + 30);
   const seen = store.get("rm_seen", []); passed.forEach(s => { const key = S.wlang + ":" + s.id; if (seen.indexOf(key) < 0) seen.push(key); }); store.set("rm_seen", seen);
+  const pl = store.get("rm_places", {}); passed.forEach(s => { const key = S.wlang + ":" + s.id, o = pl[key] || { t: s.title, lat: s.lat, lon: s.lon, n: 0 }; o.n++; o.d = Date.now(); pl[key] = o; }); store.set("rm_places", pl);
+  if (r.done > 100) saveTrack(rt, r.done);
+  markPlanDone(completed || frac >= .6);
   const c = S.challenge, won = !!(c && completed && tt < c.time);
   const run = { date: new Date().toISOString(), dist: r.dist, time: tt, planned: rt.total, sport: S.sport, completed: completed || frac >= .9, climb: Math.round(rt.ascent * frac), places: passed.length, won, start: [S.start.lng, S.start.lat] };
   if (r.dist > 100) { const runs = store.get("rm_runs", []); runs.unshift(run); store.set("rm_runs", runs.slice(0, 50)); }
   const newly = r.dist > 100 ? checkBadges(run) : [];
-  say(t(completed ? "vDone" : "vEnd"), "alert");
+  say(t(completed ? (oneWay() ? "vArrived" : "vDone") : "vEnd"), "alert");
   S.lastRun = { run, rt, passed };
   $("sumGhost").hidden = !(c && completed);
   if (c && completed) $("sumGhost").textContent = t(won ? "beat" : "lost", c.name, fmtClock(Math.abs(c.time - tt)));
@@ -1194,6 +1343,7 @@ function endRun(completed) {
   $("sumBadges").innerHTML = newly.map(k => '<p class="newbadge">' + t("newBadge", t("b_" + k)) + '</p>').join("");
   $("sumChallenge").hidden = !(canLink(rt) && completed && r.dist > 100);
   $("summary").showModal();
+  renderExplore(); renderPlan();
 }
 $("sumClose").addEventListener("click", () => $("summary").close());
 $("sumChallenge").addEventListener("click", () => {
@@ -1233,12 +1383,224 @@ async function makeCard(L0) {
 }
 $("sumImage").addEventListener("click", async () => { if (S.lastRun) await shareFile(await makeCard(S.lastRun), "Ruta a Medida"); });
 
+// ================= Mis zonas: por dónde ya corriste y qué ya conociste =================
+// Cuadrícula de unos 40 m: sirve para saber qué parte de una ruta nueva ya conoces.
+const GRID = .0004;
+const cellKey = (lng, lat) => Math.round(lng / GRID) + "_" + Math.round(lat / GRID);
+let gridCache = null;
+function historyGrid() {
+  if (gridCache) return gridCache;
+  const set = new Set();
+  store.get("rm_tracks", []).forEach(tr => {
+    for (let i = 1; i < tr.c.length; i++) {
+      const a = tr.c[i - 1], b = tr.c[i], n = Math.max(1, Math.ceil(haversine(a, b) / 20));
+      for (let k = 0; k <= n; k++) set.add(cellKey(a[0] + (b[0] - a[0]) * k / n, a[1] + (b[1] - a[1]) * k / n));
+    }
+  });
+  return gridCache = set;
+}
+function novelty(rt) {
+  const g = historyGrid(); if (!g.size) return null;
+  let n = 0, fresh = 0;
+  for (let d = 0; d < rt.total; d += 25) { const q = rt.at(d).ll; n++; if (!g.has(cellKey(q[0], q[1]))) fresh++; }
+  return n ? Math.round(fresh / n * 100) : null;
+}
+function freshBonus(r) { return r.fresh == null ? 0 : (S.explore === "repeat" ? 100 - r.fresh : r.fresh) * .3; }
+function saveTrack(rt, upto) {
+  const c = []; let last = null;
+  for (let i = 0; i < rt.coords.length && rt.cum[i] <= upto + 1; i++) { const q = [+rt.coords[i][0].toFixed(5), +rt.coords[i][1].toFixed(5)]; if (!last || haversine(last, q) >= 20) { c.push(q); last = q; } }
+  if (c.length < 2) return;
+  let tracks = store.get("rm_tracks", []), tot = 0;
+  tracks.unshift({ d: new Date().toISOString(), s: S.sport, c });
+  // Límite de espacio en el teléfono: se quitan primero las salidas más viejas.
+  tracks = tracks.filter(tr => (tot += tr.c.length) <= 40000);
+  store.set("rm_tracks", tracks); gridCache = null; drawHistory();
+}
+function drawHistory() {
+  if (histLayer) { histLayer.remove(); histLayer = null; }
+  const tracks = store.get("rm_tracks", []), places = Object.values(store.get("rm_places", {})), has = tracks.length > 0 || places.length > 0;
+  if (histBtn) { histBtn.style.display = has ? "" : "none"; histBtn.className = "histbtn" + (S.showHist ? " on" : ""); }
+  if (!S.showHist || !has) return;
+  histLayer = L.layerGroup().addTo(map);
+  tracks.forEach(tr => {
+    const ll = tr.c.map(q => [q[1], q[0]]);
+    L.polyline(ll, { pane: "hist", color: "#b14dff", weight: 16, opacity: .22, interactive: false }).addTo(histLayer);
+    L.polyline(ll, { pane: "hist", color: "#d98bff", weight: 4, opacity: .95, interactive: false, className: "histline" }).addTo(histLayer);
+  });
+  places.forEach(q => L.marker([q.lat, q.lon], { zIndexOffset: -100, icon: L.divIcon({ className: "", html: '<div class="placemark">✓</div>', iconSize: [22, 22] }) })
+    .bindTooltip(shortTitle(q.t) + " · " + t("visitedN", q.n)).addTo(histLayer));
+}
+function renderExplore() {
+  const tracks = store.get("rm_tracks", []), places = Object.keys(store.get("rm_places", {})).length, runs = store.get("rm_runs", []);
+  const has = tracks.length > 0 || places > 0;
+  $("explore").hidden = !has; $("histNote").hidden = !has;
+  $("explore").querySelectorAll("[data-x]").forEach(x => x.setAttribute("aria-pressed", String(x.dataset.x === S.explore)));
+  if (has) $("histNote").textContent = t("histNote", (runs.reduce((a, r) => a + r.dist, 0) / 1000).toFixed(1), runs.length === 1 ? t("out1") : t("outN", runs.length), places + " " + t(places === 1 ? "place1" : "placeN"));
+}
+$("explore").addEventListener("click", e => { const b = e.target.closest("[data-x]"); if (b) { S.explore = b.dataset.x; store.set("rm_explore", S.explore); renderExplore(); } });
+
+// ================= Plan de entrenamiento =================
+const WTYPES = { easy: { km: 6, mix: [70, 20, 5, 5] }, tempo: { km: 7, mix: [70, 20, 5, 5], hard: 1 }, intervals: { km: 6, mix: [100, 0, 0, 0], hard: 1 }, long: { km: 14, mix: [70, 20, 5, 5], hard: 1 }, hills: { km: 6, mix: [20, 20, 30, 30], hard: 1 }, bike: { km: 25, mix: [70, 20, 5, 5], bike: 1 }, rest: { km: 0 } };
+const ymd = d => { d = new Date(d); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
+const addDays = (x, n) => { const d = new Date(x + "T12:00:00"); d.setDate(d.getDate() + n); return ymd(d); };
+const dayName = (x, o) => new Date(x + "T12:00:00").toLocaleDateString(LANG === "es" ? "es-MX" : "en-US", o);
+const cap = x => x.charAt(0).toUpperCase() + x.slice(1);
+const planGet = () => store.get("rm_plan", []);
+const planSet = p => store.set("rm_plan", p.filter(w => w.date >= addDays(ymd(Date.now()), -30)));
+const dayItems = (p, d) => p.filter(w => w.date === d).sort((a, b) => a.time < b.time ? -1 : 1);
+const isHard = w => !!(WTYPES[w.type] || {}).hard;
+
+// Pronóstico por hora para los próximos 7 días.
+const PW = { at: 0, hours: null };
+async function loadPlanWeather(force) {
+  const q = S.start || S.here; if (!q) return;
+  if (!force && PW.at && Date.now() - PW.at < 1800000) return;
+  PW.at = Date.now();
+  try {
+    const j = await getJSON("https://api.open-meteo.com/v1/forecast?latitude=" + q.lat.toFixed(3) + "&longitude=" + q.lng.toFixed(3) + "&hourly=temperature_2m,apparent_temperature,precipitation_probability,weather_code,uv_index,wind_speed_10m,is_day&forecast_days=8&timezone=auto", 10000);
+    const h = j.hourly; PW.hours = {};
+    h.time.forEach((tm, i) => PW.hours[tm] = { tm, temp: h.temperature_2m[i], feels: h.apparent_temperature[i], prob: (h.precipitation_probability && h.precipitation_probability[i]) || 0, code: h.weather_code[i], uv: (h.uv_index && h.uv_index[i]) || 0, wind: h.wind_speed_10m[i], day: h.is_day[i] });
+  } catch (e) { PW.at = 0; }
+  renderPlan();
+}
+const planHour = w => PW.hours && PW.hours[w.date + "T" + w.time.slice(0, 2) + ":00"];
+function gearFor(h) {
+  const g = [], k = wxKind(h.code);
+  if (k === "rain" || k === "storm" || h.prob >= 50) g.push(t("gRain"));
+  if (h.feels >= 25) g.push(t("gHot"));
+  if (h.feels <= 10) g.push(t("gCold"));
+  if (!h.day) g.push(t("gNight"));
+  return (g.length ? g : [t("gNormal")]).join(", ");
+}
+// Recomendaciones: clima a esa hora, mejor hora del día, carga de la semana y cómo prepararse la noche anterior.
+function planAdvice(w, p) {
+  const out = { wx: [], load: [], prep: [], best: null }, h = planHour(w);
+  const prev = dayItems(p, addDays(w.date, -1)), next = dayItems(p, addDays(w.date, 1)), same = dayItems(p, w.date).filter(x => x.type !== "rest");
+  if (w.type === "rest") {
+    if (prev.some(isHard)) out.load.push(t("lRestGood"));
+    out.prep.push(t("pRest"));
+    return out;
+  }
+  if (h) {
+    out.wx = wxAdvice({ code: h.code, rainNow: 0, rainProb: h.prob, feels: h.feels, uv: h.uv, wind: h.wind, day: h.day });
+    let best = null;
+    for (let hr = 5; hr <= 21; hr++) { const x = PW.hours[w.date + "T" + String(hr).padStart(2, "0") + ":00"]; if (x && (!best || hourScore(x) < hourScore(best))) best = x; }
+    if (best && best.tm !== h.tm && hourScore(h) - hourScore(best) >= 10) out.best = best;
+  }
+  if (isHard(w) && prev.some(isHard)) out.load.push(t("lPrevHard"));
+  if (isHard(w) && next.some(isHard)) out.load.push(t("lNextHard"));
+  if (same.length > 1) out.load.push(t("lDouble"));
+  let hardDays = 0; for (let i = -3; i <= 3; i++) if (dayItems(p, addDays(w.date, i)).some(isHard)) hardDays++;
+  if (isHard(w) && hardDays >= 4) out.load.push(t("lTooMuch"));
+  const hr = +w.time.slice(0, 2);
+  out.prep.push(t("tip_" + w.type));
+  out.prep.push(hr < 9 ? t("prepEarly") : hr >= 19 ? t("prepNight") : t("prepDay"));
+  out.prep.push(isHard(w) || w.km >= 12 ? t("prepCarbs") : t("prepSleep"));
+  if (h) out.prep.push(t("gear", gearFor(h)));
+  return out;
+}
+function renderPlan() {
+  const p = planGet(), today = ymd(Date.now()), tomorrow = addDays(today, 1);
+  if (!S.planDay || S.planDay < today) { const nx = p.filter(w => w.date >= today && !w.done && w.type !== "rest").sort((a, b) => (a.date + a.time) < (b.date + b.time) ? -1 : 1)[0]; S.planDay = nx ? nx.date : today; }
+  let s = "";
+  for (let i = 0; i < 14; i++) {
+    const d = addDays(today, i), its = dayItems(p, d), w = its[0], work = its.filter(x => x.type !== "rest");
+    const cls = !its.length ? "" : !work.length ? " rest" : work.every(x => x.done) ? " done" : " has";
+    s += '<button type="button" class="day' + cls + (d === S.planDay ? ' sel' : '') + '" data-day="' + d + '"><small>' + (i === 0 ? t("today") : dayName(d, { weekday: "short" })) + '</small><b>' + (+d.slice(8)) + '</b><i>' + (w ? (w.done ? "✓ " : "") + t("w_" + w.type) + (its.length > 1 ? " +" + (its.length - 1) : "") : "·") + '</i></button>';
+  }
+  $("week").innerHTML = s;
+  const d = S.planDay, its = dayItems(p, d), rel = d === today ? t("today") + " · " : d === tomorrow ? t("tomorrow") + " · " : "";
+  let h = '<div class="dayhead"><b>' + rel + cap(dayName(d, { weekday: "long", day: "numeric", month: "short" })) + '</b><button type="button" class="linkbtn" data-add="1">' + t("addWorkout") + '</button></div>';
+  if (!its.length) h += '<p class="note">' + t("freeDay") + '</p>';
+  its.forEach(w => {
+    const a = planAdvice(w, p), hr = planHour(w), rest = w.type === "rest", list = a.load.concat(a.wx);
+    h += '<div class="wcard' + (w.done ? ' done' : '') + '"><div class="wtop"><b>' + (rest ? t("w_rest") : w.time + " · " + t("w_" + w.type) + " · " + w.km + " km") + (w.done ? " ✓" : "") + '</b>' +
+      (!rest && hr ? '<span class="wwx">' + WX_ICON[wxKind(hr.code)] + " " + Math.round(hr.temp) + "° · " + t("wxRain", hr.prob) + '</span>' : !rest && d > addDays(today, 6) ? '<span class="wwx">' + t("noForecast") + '</span>' : '') + '</div>';
+    if (list.length) h += '<ul class="wadv">' + list.map(x => '<li>' + x + '</li>').join("") + '</ul>';
+    if (a.best) h += '<p class="wbest">' + t("betterHour", a.best.tm.slice(11, 16), Math.round(a.best.feels)) + ' <button type="button" class="linkbtn" data-move="' + w.id + '" data-to="' + a.best.tm.slice(11, 16) + '">' + t("moveThere") + '</button></p>';
+    // Los consejos de preparación se abren solos el día anterior.
+    h += '<details class="wprep"' + (rest || d === tomorrow ? ' open' : '') + '><summary><b>' + t(rest ? "restTitle" : "prepTitle") + '</b></summary><ul class="wadv">' + a.prep.map(x => '<li>' + x + '</li>').join("") + '</ul></details>';
+    h += '<div class="wbtns">' + (!rest && !w.done ? '<button type="button" class="ghost" data-use="' + w.id + '">' + t("makeRoute") + '</button>' : '') + '<button type="button" class="ghost" data-edit="' + w.id + '">' + t("edit") + '</button>' + (!rest ? '<button type="button" class="ghost" data-ics="' + w.id + '">' + t("toCalendar") + '</button>' : '') + '</div></div>';
+  });
+  $("dayBox").innerHTML = h;
+}
+$("week").addEventListener("click", e => { const b = e.target.closest("[data-day]"); if (b) { S.planDay = b.dataset.day; renderPlan(); } });
+$("dayBox").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  const p = planGet(), id = +(b.dataset.edit || b.dataset.use || b.dataset.ics || b.dataset.move || 0), w = p.find(x => x.id === id);
+  if (b.dataset.add) openPlanDlg(null, S.planDay);
+  else if (w && b.dataset.edit) openPlanDlg(w.id);
+  else if (w && b.dataset.use) usePlan(w);
+  else if (w && b.dataset.ics) downloadIcs([w]);
+  else if (w && b.dataset.move) { w.time = b.dataset.to; planSet(p); renderPlan(); }
+});
+// Lleva el entreno al formulario para crear la ruta.
+function usePlan(w) {
+  const ty = WTYPES[w.type] || WTYPES.easy;
+  setSport(ty.bike ? "bike" : "run", true); S.km = w.km; TYPES.forEach((x, i) => S.mix[x.k] = ty.mix[i]); setMode("train"); renderSetup();
+  S.planUse = w.id; showMsg(t("planReady", t("w_" + w.type), w.km));
+  $("go").scrollIntoView({ behavior: "smooth", block: "center" });
+}
+function markPlanDone(ok) {
+  if (ok) {
+    const p = planGet(), today = ymd(Date.now());
+    const w = p.find(x => x.id === S.planUse) || p.find(x => x.date === today && !x.done && x.type !== "rest" && !!(WTYPES[x.type] || {}).bike === bike());
+    if (w) { w.done = true; planSet(p); }
+  }
+  S.planUse = null;
+}
+// Semana sugerida: solo llena los días que tienes libres.
+$("planSuggest").addEventListener("click", () => {
+  const p = planGet(), first = addDays(ymd(Date.now()), 1), pat = ["easy", "intervals", "rest", "tempo", "easy", "long", "rest"];
+  pat.forEach((ty, i) => { const d = addDays(first, i); if (!dayItems(p, d).length) p.push({ id: Date.now() + i, date: d, time: "07:00", type: ty, km: WTYPES[ty].km, done: false }); });
+  planSet(p); S.planDay = first; renderPlan();
+});
+// Formulario para crear, mover o borrar un entreno.
+let editId = null;
+$("pType").innerHTML = Object.keys(WTYPES).map(k => '<option value="' + k + '">' + t("w_" + k) + '</option>').join("");
+function pTypeUI() { const r = $("pType").value === "rest"; $("pTime").disabled = r; $("pKm").disabled = r; }
+function openPlanDlg(id, date) {
+  const w = id ? planGet().find(x => x.id === id) : null; editId = w ? w.id : null;
+  $("pTitle").textContent = t(w ? "editWorkout" : "newWorkout");
+  $("pType").value = w ? w.type : "easy"; $("pDate").value = w ? w.date : (date || ymd(Date.now())); $("pTime").value = w ? w.time : "07:00"; $("pKm").value = w ? w.km : WTYPES.easy.km;
+  $("pDel").hidden = !w; pTypeUI(); $("planDlg").showModal();
+}
+$("pType").addEventListener("change", () => { $("pKm").value = WTYPES[$("pType").value].km || ""; pTypeUI(); });
+$("pCancel").addEventListener("click", () => $("planDlg").close());
+$("pDel").addEventListener("click", () => { planSet(planGet().filter(x => x.id !== editId)); $("planDlg").close(); renderPlan(); });
+$("pSave").addEventListener("click", () => {
+  const ty = $("pType").value, date = $("pDate").value || S.planDay, old = planGet().find(x => x.id === editId);
+  const km = parseFloat(String($("pKm").value).replace(",", ".")) || WTYPES[ty].km;
+  const item = { id: editId || Date.now(), date, time: $("pTime").value || "07:00", type: ty, km: ty === "rest" ? 0 : Math.min(200, km), done: old ? old.done && old.date === date : false };
+  // Un descanso deja el día libre; un entreno en un día de descanso quita el descanso.
+  let p = planGet().filter(x => x.id !== item.id && !(x.date === date && (ty === "rest" ? !x.done : x.type === "rest")));
+  p.push(item); planSet(p); S.planDay = date; $("planDlg").close(); renderPlan();
+});
+// Calendario del teléfono: un aviso la noche anterior (8 pm) y otro una hora antes.
+function downloadIcs(list) {
+  if (!list.length) return;
+  const NL = String.fromCharCode(13, 10), p = planGet(), stamp = new Date().toISOString().split("-").join("").split(":").join("").slice(0, 15) + "Z";
+  const clean = x => String(x).split(",").join(" ").split(";").join(" ");
+  const ev = list.map(w => {
+    const a = planAdvice(w, p), start = new Date(w.date + "T" + w.time + ":00"), eve = new Date(addDays(w.date, -1) + "T20:00:00");
+    const before = Math.max(30, Math.round((start - eve) / 60000)), dur = Math.max(20, Math.round((WTYPES[w.type] || {}).bike ? w.km / S.speed * 60 : w.km * S.pace / 60));
+    return ["BEGIN:VEVENT", "UID:rm-" + w.id + "@ruta-a-medida", "DTSTAMP:" + stamp, "DTSTART:" + w.date.split("-").join("") + "T" + w.time.split(":").join("") + "00", "DURATION:PT" + dur + "M",
+      "SUMMARY:" + clean(t("w_" + w.type) + " " + w.km + " km · Ruta a Medida"), "DESCRIPTION:" + clean(a.load.concat(a.wx, a.prep).join(" / ")),
+      "BEGIN:VALARM", "ACTION:DISPLAY", "DESCRIPTION:" + clean(t("icsEve", t("w_" + w.type), w.time)), "TRIGGER:-PT" + before + "M", "END:VALARM",
+      "BEGIN:VALARM", "ACTION:DISPLAY", "DESCRIPTION:" + clean(t("icsSoon")), "TRIGGER:-PT60M", "END:VALARM", "END:VEVENT"].join(NL);
+  });
+  const ics = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Ruta a Medida//" + LANG.toUpperCase(), "CALSCALE:GREGORIAN"].concat(ev, ["END:VCALENDAR"]).join(NL) + NL;
+  const file = new File([ics], "entrenos-ruta-a-medida.ics", { type: "text/calendar" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(file); a.download = file.name; document.body.appendChild(a); a.click(); a.remove();
+}
+$("planIcs").addEventListener("click", () => { const today = ymd(Date.now()); downloadIcs(planGet().filter(w => w.date >= today && !w.done && w.type !== "rest")); });
+
 // ================= Rutas compartidas y retos por link =================
 async function openSharedSights(main) {
   const parts = main.split("lugares=")[1].split("_");
   const lang = parts[0] === "en" ? "en" : "es", v = parts.slice(1).map(Number);
   if (v.length < 9 || v.some(x => !isFinite(x))) return false;
-  S.wlang = lang;
+  S.wlang = lang; setEndMode("loop");
   if (v[0] > 0) { S.bikeType = BIKE_TYPES[v[0] - 1] || BIKE_TYPES[0]; setSport("bike", true); } else setSport("run", true);
   S.km = v[1]; TYPES.forEach((x, i) => S.mix[x.k] = v[2 + i]); setMode("sights"); renderSetup();
   setStart(v[6], v[7], "shared", t("sharedPoint")); map.setView([v[6], v[7]], 14);
@@ -1253,6 +1615,28 @@ async function openSharedSights(main) {
   } catch (e) { showMsg(errText(e.status || 0), true); }
   return true;
 }
+async function openSharedVia(main) {
+  const parts = main.split("via=")[1].split("_"), lang = parts[0] === "en" ? "en" : "es", v = parts.slice(1).map(Number);
+  if (v.length < 12 || v.some(x => !isFinite(x))) return false;
+  const n = v[7]; if (n < 2 || v.length < 8 + n * 2) return false;
+  const pts = []; for (let i = 0; i < n; i++) pts.push([v[9 + i * 2], v[8 + i * 2]]);
+  const ids = v.slice(8 + n * 2);
+  S.wlang = lang;
+  if (v[0] > 0) { S.bikeType = BIKE_TYPES[v[0] - 1] || BIKE_TYPES[0]; setSport("bike", true); } else setSport("run", true);
+  S.km = v[1]; TYPES.forEach((x, i) => S.mix[x.k] = v[2 + i]); S.quiet = v[6] === 1; setMode(ids.length ? "sights" : "train"); renderSetup();
+  setStart(pts[0][1], pts[0][0], "shared", t("sharedPoint")); setEnd(pts[n - 1][1], pts[n - 1][0], t("sharedEnd")); setEndMode("point");
+  map.setView([pts[0][1], pts[0][0]], 14);
+  showMsg(t("loadingShared"));
+  try {
+    const f = await orsRoute({ coordinates: pts }), r = routeFromFeature(f, { wps: pts });
+    if (ids.length) {
+      const j = await getJSON(wapi(lang) + "action=query&prop=coordinates&pageids=" + ids.join("%7C")), pages = (j.query && j.query.pages) || {};
+      r.sights = placeSights(r, ids.map(id => pages[id]).filter(q => q && q.coordinates).map(q => ({ id: q.pageid, title: q.title, lat: q.coordinates[0].lat, lon: q.coordinates[0].lon })));
+    }
+    S.routes = [r]; S.opt = 0; showMsg(S.challenge ? "" : t("sharedReady")); showResult(true); await loadSightInfo();
+  } catch (e) { showMsg(errText(e.status || 0), true); }
+  return true;
+}
 async function openShared() {
   const parts = location.hash.split("&reto="), main = parts[0];
   if (parts[1]) {
@@ -1260,11 +1644,12 @@ async function openShared() {
     if (isFinite(time) && time > 0) S.challenge = { name: name || t("aFriend"), time };
   }
   const showChallenge = () => { if (S.challenge && S.routes.length) { $("challengeBox").hidden = false; $("challengeBox").innerHTML = t("challengeBox", esc(S.challenge.name), fmtKm(S.routes[0].total), fmtClock(S.challenge.time)); } };
+  if (main.indexOf("via=") >= 0) { const ok = await openSharedVia(main); showChallenge(); return ok; }
   if (main.indexOf("lugares=") >= 0) { const ok = await openSharedSights(main); showChallenge(); return ok; }
   const m = main.split("ruta=")[1]; if (!m) return false;
   const v = m.split("_").map(Number); if (v.length < 11 || v.some(x => !isFinite(x))) return false;
   if (v[11] > 0) { S.bikeType = BIKE_TYPES[v[11] - 1] || BIKE_TYPES[0]; setSport("bike", true); } else setSport("run", true);
-  S.km = v[2]; TYPES.forEach((x, i) => S.mix[x.k] = v[3 + i]); S.quiet = v[7] === 1; setMode("train"); renderSetup();
+  S.km = v[2]; TYPES.forEach((x, i) => S.mix[x.k] = v[3 + i]); S.quiet = v[7] === 1; setMode("train"); setEndMode("loop"); renderSetup();
   setStart(v[0], v[1], "shared", t("sharedPoint"));
   map.setView([v[0], v[1]], 15);
   showMsg(t("loadingShared"));
@@ -1279,6 +1664,7 @@ window.addEventListener("online", net); window.addEventListener("offline", net);
 if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
 if (!store.get("rm_tip", false)) $("tip").hidden = false;
 $("tipClose").addEventListener("click", () => { $("tip").hidden = true; store.set("rm_tip", true); });
+renderExplore(); renderPlan(); drawHistory(); setEndMode("loop");
 setSport(S.sport, S.sport !== "bike");
 openShared().then(shared => { gpsFirst = !shared; locate(false); });
 </script>
