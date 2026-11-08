@@ -50,6 +50,8 @@ body.running .gps { display: none }
 .qres button:hover, .qres button:focus-visible { background: var(--bg2) }
 main { padding: 16px max(16px, env(safe-area-inset-right, 0px)) calc(28px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; max-width: 640px; margin: 0 auto }
 body.running main { display: none }
+.fab { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 1000; border: 0; border-radius: 999px; padding: 13px 20px; font: 800 15px var(--f-body); background: linear-gradient(90deg, #ff5a36, #ff9b3d); color: #fff; box-shadow: 0 10px 24px rgba(20,33,61,.35); cursor: pointer; white-space: nowrap }
+body.running .fab { display: none }
 .h { font-family: var(--f-display); text-transform: uppercase; letter-spacing: .06em; font-weight: 700; font-size: 15px; color: var(--muted); display: flex; justify-content: space-between; align-items: center; gap: 8px }
 .sec { display: grid; gap: 10px }
 .tip { margin: 0; padding: 12px 14px; border-radius: 14px; background: var(--card); border: 1px solid var(--line); font-size: 14px }
@@ -291,7 +293,7 @@ window.addEventListener("error", function (e) {
   <p class="msg" id="msg" hidden></p>
 
   <section class="sec" id="result" hidden>
-    <div class="h"><span data-t="chooseRoute"></span><button type="button" class="linkbtn" id="more" data-t="moreRoutes"></button></div>
+    <div class="h"><span data-t="chooseRoute"></span><span style="display:flex;gap:12px"><button type="button" class="linkbtn" id="toMap" data-t="viewMap"></button><button type="button" class="linkbtn" id="more" data-t="moreRoutes"></button></span></div>
     <div class="opts" id="opts"></div>
     <div class="stats" id="stats"></div>
     <p class="note" id="roads"></p>
@@ -314,6 +316,7 @@ window.addEventListener("error", function (e) {
   </section>
   <section class="fbcard" id="fbCard" hidden><p data-t="fbCard"></p><button type="button" id="fbOpen" data-t="fbBtn"></button></section>
 </main>
+<button type="button" class="fab" id="fab" hidden data-t="toOptions"></button>
 
 <section class="run" id="run" hidden>
   <p class="offroute" id="offroute" hidden data-t="offroute"></p>
@@ -463,6 +466,7 @@ const I = {
     prepCarbs: "Cena con carbohidratos (pasta, arroz) y duerme de 7 a 9 horas.", prepSleep: "Toma agua durante el día y duerme de 7 a 9 horas.", gear: "Ropa: {0}.", gRain: "chamarra ligera y gorra", gHot: "ropa ligera, gorra, lentes y bloqueador", gCold: "capas y guantes", gNight: "algo reflectante o una luz", gNormal: "ropa cómoda",
     lPrevHard: "El día anterior también es fuerte: hazlo más suave o muévelo para descansar.", lNextHard: "Al día siguiente también hay entreno fuerte: no te vacíes hoy.", lDouble: "Doble sesión: deja al menos 6 horas entre las dos y come en medio.",
     lRestGood: "Buen momento para descansar después del esfuerzo.", lTooMuch: "Muchos días fuertes juntos: considera cambiar uno por rodaje suave.", pRest: "Descanso: estira o camina 15 a 20 min, toma agua y duerme bien.",
+    viewMap: "Ver en el mapa ↑", toOptions: "Elegir ruta y empezar ↓",
     fbBtn: "Danos tu opinión", fbTitle: "¿Qué te pareció Ruta a Medida?", fbStars: "Califica la app", fbAgain: "¿La volverías a usar?", fbYes: "Sí", fbMaybe: "Tal vez", fbNo: "No", fbText: "¿Qué te gustó o qué mejorarías?", fbSend: "Enviar",
     fbThanks: "¡Gracias! Tu opinión nos ayuda a mejorar.", fbFail: "No se pudo enviar. Revisa tu conexión.", fbCard: "¿Nos ayudas? Estamos probando la app y tu opinión cuenta.",
     privTitle: "Privacidad", privText: "Tu ubicación, tus rutas, tu historial y tu plan se guardan solo en tu teléfono. Para crear rutas enviamos los puntos del mapa a OpenRouteService; para el clima, a Open-Meteo; y para los lugares, a Wikipedia. Contamos de forma anónima cuántas veces se usa la app, sin tu nombre ni tu ubicación.",
@@ -536,6 +540,7 @@ const I = {
     prepCarbs: "Have a carb-rich dinner (pasta, rice) and sleep 7 to 9 hours.", prepSleep: "Drink water through the day and sleep 7 to 9 hours.", gear: "Clothes: {0}.", gRain: "light jacket and cap", gHot: "light clothes, cap, sunglasses and sunscreen", gCold: "layers and gloves", gNight: "something reflective or a light", gNormal: "comfortable clothes",
     lPrevHard: "The day before is also hard: go easier or move it to rest.", lNextHard: "The next day is also hard: don't empty the tank today.", lDouble: "Double session: leave at least 6 hours between them and eat in between.",
     lRestGood: "Good time to rest after the effort.", lTooMuch: "Lots of hard days together: consider swapping one for an easy run.", pRest: "Rest: stretch or walk 15 to 20 min, drink water and sleep well.",
+    viewMap: "See on map ↑", toOptions: "Choose route and start ↓",
     fbBtn: "Give us feedback", fbTitle: "What did you think of Ruta a Medida?", fbStars: "Rate the app", fbAgain: "Would you use it again?", fbYes: "Yes", fbMaybe: "Maybe", fbNo: "No", fbText: "What did you like or what would you improve?", fbSend: "Send",
     fbThanks: "Thank you! Your feedback helps us improve.", fbFail: "Couldn't send it. Check your connection.", fbCard: "Can you help? We're testing the app and your opinion counts.",
     privTitle: "Privacy", privText: "Your location, routes, history and plan are stored only on your phone. To create routes we send the map points to OpenRouteService; for weather, to Open-Meteo; and for places, to Wikipedia. We anonymously count how often the app is used, without your name or location.",
@@ -1066,7 +1071,9 @@ function estMinutes(rt) { return (bike() ? (rt.total / 1000 + rt.ascent * 10 / 1
 function showResult(scroll) {
   $("result").hidden = false;
   renderResult();
-  if (scroll) $("result").scrollIntoView({ behavior: "smooth", block: "start" });
+  // Primero se ve la ruta dibujada en el mapa; el botón flotante lleva a las opciones.
+  updateFab();
+  if (scroll) showMapView();
 }
 function renderResult() {
   const rt = S.routes[S.opt];
@@ -1084,7 +1091,15 @@ function renderResult() {
   $("profLabel").textContent = t("profHint");
   drawRoutes(true);
 }
-$("opts").addEventListener("click", e => { const o = e.target.closest("[data-o]"); if (o) { S.opt = +o.dataset.o; renderResult(); } });
+$("opts").addEventListener("click", e => { const o = e.target.closest("[data-o]"); if (o) { S.opt = +o.dataset.o; renderResult(); showMapView(); } });
+function showMapView() { window.scrollTo({ top: 0, behavior: "smooth" }); setTimeout(() => map.invalidateSize(), 400); }
+$("toMap").addEventListener("click", showMapView);
+$("fab").addEventListener("click", () => $("result").scrollIntoView({ behavior: "smooth", block: "start" }));
+// El botón flotante aparece solo cuando hay ruta y las opciones no se ven en pantalla.
+let resultVisible = false;
+function updateFab() { $("fab").hidden = !S.routes.length || $("result").hidden || resultVisible || !!S.run; }
+if ("IntersectionObserver" in window) new IntersectionObserver(es => { resultVisible = es[0].isIntersecting; updateFab(); }).observe($("result"));
+window.addEventListener("scroll", updateFab, { passive: true });
 
 function drawRoutes(fit) {
   if (routeLayer) routeLayer.remove();
