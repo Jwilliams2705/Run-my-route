@@ -1,5 +1,5 @@
 // Ruta a Medida: permite abrir la app y ver rutas guardadas sin internet.
-const VERSION = "rm-v2";
+const VERSION = "rm-v4";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png",
   "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css",
   "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"];
@@ -23,9 +23,9 @@ self.addEventListener("fetch", e => {
   if (req.method !== "GET") return;
   const url = new URL(req.url);
   // Las rutas y la búsqueda de lugares siempre van a internet.
-  if (url.hostname === "api.openrouteservice.org") return;
+  if (url.hostname === "api.openrouteservice.org" || url.hostname === "api.heigit.org" || url.hostname.endsWith("workers.dev")) return;
   // Mapa: usa lo guardado y descarga lo nuevo.
-  if (url.hostname.endsWith("tile.openstreetmap.org")) {
+  if (url.hostname.endsWith("tile.openstreetmap.org") || (url.hostname === "api.maptiler.com" && url.pathname.indexOf("/maps/") === 0)) {
     e.respondWith(caches.open(TILES).then(async c => {
       const hit = await c.match(req);
       if (hit) return hit;
