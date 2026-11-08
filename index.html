@@ -183,6 +183,12 @@ dialog .check { display: flex; gap: 8px; align-items: center; font-weight: 600 }
 .placemark { width: 22px; height: 22px; border-radius: 50%; background: linear-gradient(135deg, #b14dff, #ff4fd8); color: #fff; border: 2px solid #fff; font: 800 12px/18px var(--f-body); text-align: center; box-shadow: 0 0 10px #d98bff }
 .endmark { width: 30px; height: 30px; border-radius: 50%; background: #fff; border: 3px solid #14213d; font-size: 15px; line-height: 24px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,.3) }
 dialog input[type=date], dialog input[type=time], dialog input[type=number] { width: 100%; border: 2px solid var(--line); border-radius: 12px; padding: 10px; font-family: var(--f-body); font-size: 14px; background: var(--bg); color: var(--ink) }
+.stars { display: flex; gap: 4px } .stars button { border: 0; background: none; font-size: 32px; line-height: 1; color: var(--line); cursor: pointer; padding: 2px }
+.stars button.on { color: var(--sun) }
+dialog textarea { width: 100%; min-height: 90px; border: 2px solid var(--line); border-radius: 12px; padding: 10px; font-family: var(--f-body); font-size: 14px; background: var(--bg); color: var(--ink); resize: vertical }
+.fbcard { background: linear-gradient(135deg, #6c3bff, #ff4fd8); color: #fff; border-radius: 16px; padding: 14px; display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap }
+.fbcard p { margin: 0; font-size: 14px; font-weight: 600; flex: 1 1 180px } .fbcard button { border: 0; border-radius: 12px; padding: 9px 14px; font: 800 14px var(--f-body); background: #fff; color: #6c3bff; cursor: pointer }
+.priv summary { cursor: pointer; font-weight: 700; margin-top: 12px } .priv p { font-size: 13px; color: var(--muted); margin: 6px 0 0 }
 .wx button { border: 0; background: rgba(255,255,255,.2); color: #fff; border-radius: 10px; padding: 6px 10px; font-size: 12px; font-weight: 700; margin-left: auto; flex: none }
 [hidden] { display: none !important }
 .errbox { overflow-wrap: anywhere; margin: 0; padding: 10px 14px; background: var(--bad); color: #fff; font-size: 13px }
@@ -306,6 +312,7 @@ window.addEventListener("error", function (e) {
     <div id="profile"></div>
     <p class="proflabel" id="profLabel"></p>
   </section>
+  <section class="fbcard" id="fbCard" hidden><p data-t="fbCard"></p><button type="button" id="fbOpen" data-t="fbBtn"></button></section>
 </main>
 
 <section class="run" id="run" hidden>
@@ -336,6 +343,7 @@ window.addEventListener("error", function (e) {
   <label for="key" data-t="keyLbl"></label>
   <input id="key" type="text" autocomplete="off" spellcheck="false" data-tp="keyPh">
   <p class="note" data-t="keyNote"></p>
+  <details class="priv"><summary data-t="privTitle"></summary><p data-t="privText"></p></details>
   <div class="row"><button type="button" class="ghost" id="cfgCancel" data-t="cancel"></button><button type="button" class="cta" style="font-size:16px;padding:8px 16px" id="cfgSave" data-t="save"></button></div>
 </dialog>
 
@@ -362,12 +370,24 @@ window.addEventListener("error", function (e) {
   <div class="row wrap"><button type="button" class="ghost" id="pDel" data-t="del"></button><button type="button" class="ghost" id="pCancel" data-t="cancel"></button><button type="button" class="cta" style="font-size:16px;padding:8px 16px" id="pSave" data-t="save"></button></div>
 </dialog>
 
+<dialog id="fbDlg">
+  <h2 data-t="fbTitle"></h2>
+  <label data-t="fbStars"></label>
+  <div class="stars" id="fbStars"><button type="button" data-v="1">★</button><button type="button" data-v="2">★</button><button type="button" data-v="3">★</button><button type="button" data-v="4">★</button><button type="button" data-v="5">★</button></div>
+  <label data-t="fbAgain"></label>
+  <div class="chips" id="fbAgain"><button type="button" class="chip" data-a="si" data-t="fbYes"></button><button type="button" class="chip" data-a="talvez" data-t="fbMaybe"></button><button type="button" class="chip" data-a="no" data-t="fbNo"></button></div>
+  <label for="fbText" data-t="fbText"></label>
+  <textarea id="fbText" maxlength="1000"></textarea>
+  <p class="note" id="fbMsg" hidden></p>
+  <div class="row"><button type="button" class="ghost" id="fbCancel" data-t="cancel"></button><button type="button" class="cta" style="font-size:16px;padding:8px 16px" id="fbSend" data-t="fbSend"></button></div>
+</dialog>
+
 <dialog id="summary">
   <h2 data-t="sumTitle"></h2>
   <p class="challenge" id="sumGhost" hidden></p>
   <div class="sum" id="sumBody"></div>
   <div id="sumBadges"></div>
-  <div class="row wrap"><button type="button" class="ghost" id="sumChallenge" data-t="challengeBtn"></button><button type="button" class="ghost" id="sumImage" data-t="shareImage"></button><button type="button" class="cta" style="font-size:16px;padding:8px 16px" id="sumClose" data-t="doneBtn"></button></div>
+  <div class="row wrap"><button type="button" class="ghost" id="sumChallenge" data-t="challengeBtn"></button><button type="button" class="ghost" id="sumImage" data-t="shareImage"></button><button type="button" class="ghost" id="sumFb" data-t="fbBtn" hidden></button><button type="button" class="cta" style="font-size:16px;padding:8px 16px" id="sumClose" data-t="doneBtn"></button></div>
 </dialog>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
@@ -443,6 +463,9 @@ const I = {
     prepCarbs: "Cena con carbohidratos (pasta, arroz) y duerme de 7 a 9 horas.", prepSleep: "Toma agua durante el día y duerme de 7 a 9 horas.", gear: "Ropa: {0}.", gRain: "chamarra ligera y gorra", gHot: "ropa ligera, gorra, lentes y bloqueador", gCold: "capas y guantes", gNight: "algo reflectante o una luz", gNormal: "ropa cómoda",
     lPrevHard: "El día anterior también es fuerte: hazlo más suave o muévelo para descansar.", lNextHard: "Al día siguiente también hay entreno fuerte: no te vacíes hoy.", lDouble: "Doble sesión: deja al menos 6 horas entre las dos y come en medio.",
     lRestGood: "Buen momento para descansar después del esfuerzo.", lTooMuch: "Muchos días fuertes juntos: considera cambiar uno por rodaje suave.", pRest: "Descanso: estira o camina 15 a 20 min, toma agua y duerme bien.",
+    fbBtn: "Danos tu opinión", fbTitle: "¿Qué te pareció Ruta a Medida?", fbStars: "Califica la app", fbAgain: "¿La volverías a usar?", fbYes: "Sí", fbMaybe: "Tal vez", fbNo: "No", fbText: "¿Qué te gustó o qué mejorarías?", fbSend: "Enviar",
+    fbThanks: "¡Gracias! Tu opinión nos ayuda a mejorar.", fbFail: "No se pudo enviar. Revisa tu conexión.", fbCard: "¿Nos ayudas? Estamos probando la app y tu opinión cuenta.",
+    privTitle: "Privacidad", privText: "Tu ubicación, tus rutas, tu historial y tu plan se guardan solo en tu teléfono. Para crear rutas enviamos los puntos del mapa a OpenRouteService; para el clima, a Open-Meteo; y para los lugares, a Wikipedia. Contamos de forma anónima cuántas veces se usa la app, sin tu nombre ni tu ubicación.",
     _: ""
   },
   en: {
@@ -513,6 +536,9 @@ const I = {
     prepCarbs: "Have a carb-rich dinner (pasta, rice) and sleep 7 to 9 hours.", prepSleep: "Drink water through the day and sleep 7 to 9 hours.", gear: "Clothes: {0}.", gRain: "light jacket and cap", gHot: "light clothes, cap, sunglasses and sunscreen", gCold: "layers and gloves", gNight: "something reflective or a light", gNormal: "comfortable clothes",
     lPrevHard: "The day before is also hard: go easier or move it to rest.", lNextHard: "The next day is also hard: don't empty the tank today.", lDouble: "Double session: leave at least 6 hours between them and eat in between.",
     lRestGood: "Good time to rest after the effort.", lTooMuch: "Lots of hard days together: consider swapping one for an easy run.", pRest: "Rest: stretch or walk 15 to 20 min, drink water and sleep well.",
+    fbBtn: "Give us feedback", fbTitle: "What did you think of Ruta a Medida?", fbStars: "Rate the app", fbAgain: "Would you use it again?", fbYes: "Yes", fbMaybe: "Maybe", fbNo: "No", fbText: "What did you like or what would you improve?", fbSend: "Send",
+    fbThanks: "Thank you! Your feedback helps us improve.", fbFail: "Couldn't send it. Check your connection.", fbCard: "Can you help? We're testing the app and your opinion counts.",
+    privTitle: "Privacy", privText: "Your location, routes, history and plan are stored only on your phone. To create routes we send the map points to OpenRouteService; for weather, to Open-Meteo; and for places, to Wikipedia. We anonymously count how often the app is used, without your name or location.",
     _: ""
   }
 };
@@ -536,8 +562,12 @@ const PACES = [240, 270, 300, 330, 360, 390, 420, 480, 540, 600];
 const SPEEDS = [12, 15, 18, 20, 22, 25, 28, 30, 35];
 const BIKE_TYPES = ["cycling-regular", "cycling-road", "cycling-mountain"];
 // Clave de OpenRouteService incluida. Se puede cambiar en Ajustes.
-const DEFAULT_KEY = "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjVhNDlkZTY1MWJiYzRlY2JiNzA5MDNkMGU3MWU1NGUwIiwiaCI6Im11cm11cjY0In0=";
-const ORS = "https://api.openrouteservice.org";
+// Servidor propio (Cloudflare) que guarda la clave escondida. Vacío = la app llama directo a OpenRouteService.
+const PROXY = "https://ruta-a-medida.jwilliams2705.workers.dev";
+// Clave del mapa de MapTiler (se limita a este sitio en el panel de MapTiler). Vacío = mapa de OpenStreetMap.
+const MT_KEY = "l6HqImp0oZO8XzBmh7zK";
+const DEFAULT_KEY = "";
+const ORS = "https://api.heigit.org";
 
 const $ = id => document.getElementById(id);
 const C = k => getComputedStyle(document.documentElement).getPropertyValue("--" + k).trim();
@@ -547,6 +577,7 @@ const store = {
 };
 const rawKey = () => { try { return localStorage.getItem("ors_key") || ""; } catch (e) { return ""; } };
 const getKey = () => rawKey() || DEFAULT_KEY;
+const useProxy = () => !!PROXY && !rawKey();
 
 const S = {
   km: 8, mix: { plano: 70, ondulado: 20, subida: 5, bajada: 5 }, quiet: store.get("rm_quiet", false), routeMode: "sights", sightInfo: {}, wlang: LANG,
@@ -637,7 +668,7 @@ function waysOf(f) {
 // ================= Mapa =================
 $("noMap").remove();
 const map = L.map("map", { zoomControl: false }).setView([25.651, -100.290], 14);
-L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' }).addTo(map);
+L.tileLayer(MT_KEY ? "https://api.maptiler.com/maps/streets-v2/256/{z}/{x}/{y}.png?key=" + MT_KEY : "https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: (MT_KEY ? '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> ' : '') + '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' }).addTo(map);
 const dotIcon = (color, size) => L.divIcon({ className: "", html: '<div style="width:' + size + 'px;height:' + size + 'px;border-radius:50%;background:' + color + ';border:3px solid #fff;box-shadow:0 0 0 5px rgba(20,33,61,.25)"></div>', iconSize: [size, size] });
 let startMarker = null, hereMarker = null, routeLayer = null, cursor = null, endMarker = null, histLayer = null, histBtn = null;
 // Capa propia para lo ya corrido: queda debajo de las rutas nuevas.
@@ -714,7 +745,7 @@ function hookSearch(inp, list, pick) {
     timer = setTimeout(async () => {
       const my = ++seq, c = map.getCenter();
       try {
-        const url = ORS + "/geocode/autocomplete?api_key=" + encodeURIComponent(getKey()) + "&text=" + encodeURIComponent(text) + "&focus.point.lon=" + c.lng.toFixed(4) + "&focus.point.lat=" + c.lat.toFixed(4) + "&size=5";
+        const url = (useProxy() ? PROXY + "/geocode?" : ORS + "/pelias/v1/autocomplete?api_key=" + encodeURIComponent(getKey()) + "&") + "text=" + encodeURIComponent(text) + "&focus.point.lon=" + c.lng.toFixed(4) + "&focus.point.lat=" + c.lat.toFixed(4) + "&size=5";
         const j = await fetch(url).then(r => r.json());
         if (my !== seq) return;
         const fs = (j.features || []);
@@ -782,8 +813,8 @@ const profile = () => bike() ? S.bikeType : "foot-walking";
 async function orsRoute(body) {
   let res;
   try {
-    res = await fetch(ORS + "/v2/directions/" + profile() + "/geojson", {
-      method: "POST", headers: { "Content-Type": "application/json", "Authorization": getKey() },
+    res = await fetch(useProxy() ? PROXY + "/directions/" + profile() : ORS + "/openrouteservice/v2/directions/" + profile() + "/geojson", {
+      method: "POST", headers: useProxy() ? { "Content-Type": "application/json" } : { "Content-Type": "application/json", "Authorization": getKey() },
       body: JSON.stringify(Object.assign({ elevation: true, extra_info: ["waytype"], instructions: true, language: LANG }, body))
     });
   } catch (e) { const err = new Error("red"); err.status = 0; throw err; }
@@ -860,6 +891,7 @@ async function createRoutes() {
   showResult(true);
   await loadSightInfo();
   store.set("rm_last", packRoute(S.routes[0], t("lastRoute")));
+  ping("route");
 }
 $("go").addEventListener("click", () => { S.seedBase = 0; createRoutes(); });
 $("more").addEventListener("click", () => { S.seedBase += 10; createRoutes(); });
@@ -1332,7 +1364,7 @@ function endRun(completed) {
   markPlanDone(completed || frac >= .6);
   const c = S.challenge, won = !!(c && completed && tt < c.time);
   const run = { date: new Date().toISOString(), dist: r.dist, time: tt, planned: rt.total, sport: S.sport, completed: completed || frac >= .9, climb: Math.round(rt.ascent * frac), places: passed.length, won, start: [S.start.lng, S.start.lat] };
-  if (r.dist > 100) { const runs = store.get("rm_runs", []); runs.unshift(run); store.set("rm_runs", runs.slice(0, 50)); }
+  if (r.dist > 100) { const runs = store.get("rm_runs", []); runs.unshift(run); store.set("rm_runs", runs.slice(0, 50)); ping("run"); }
   const newly = r.dist > 100 ? checkBadges(run) : [];
   say(t(completed ? (oneWay() ? "vArrived" : "vDone") : "vEnd"), "alert");
   S.lastRun = { run, rt, passed };
@@ -1344,6 +1376,7 @@ function endRun(completed) {
   $("sumChallenge").hidden = !(canLink(rt) && completed && r.dist > 100);
   $("summary").showModal();
   renderExplore(); renderPlan();
+  $("sumFb").hidden = !PROXY;
 }
 $("sumClose").addEventListener("click", () => $("summary").close());
 $("sumChallenge").addEventListener("click", () => {
@@ -1595,6 +1628,37 @@ function downloadIcs(list) {
 }
 $("planIcs").addEventListener("click", () => { const today = ymd(Date.now()); downloadIcs(planGet().filter(w => w.date >= today && !w.done && w.type !== "rest")); });
 
+// ================= Pruebas con usuarios: uso anónimo y opiniones =================
+// Un número al azar por teléfono, sin nombre ni ubicación: sirve para saber si la gente regresa.
+function ping(ev) {
+  if (!PROXY) return;
+  let uid = store.get("rm_uid", "");
+  if (!uid) { uid = Math.random().toString(36).slice(2, 12) + Date.now().toString(36); store.set("rm_uid", uid); }
+  try { fetch(PROXY + "/ping", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ uid, ev }), keepalive: true }).catch(() => {}); } catch (e) {}
+}
+let fbStars = 0, fbAgain = "";
+function openFb() {
+  fbStars = 0; fbAgain = ""; $("fbText").value = ""; $("fbMsg").hidden = true; $("fbSend").disabled = false;
+  $("fbStars").querySelectorAll("button").forEach(b => b.classList.remove("on"));
+  $("fbAgain").querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", "false"));
+  $("fbDlg").showModal();
+}
+$("fbStars").addEventListener("click", e => { const b = e.target.closest("[data-v]"); if (!b) return; fbStars = +b.dataset.v; $("fbStars").querySelectorAll("button").forEach(x => x.classList.toggle("on", +x.dataset.v <= fbStars)); });
+$("fbAgain").addEventListener("click", e => { const b = e.target.closest("[data-a]"); if (!b) return; fbAgain = b.dataset.a; $("fbAgain").querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x === b))); });
+$("fbCancel").addEventListener("click", () => $("fbDlg").close());
+$("fbOpen").addEventListener("click", openFb);
+$("sumFb").addEventListener("click", () => { $("summary").close(); openFb(); });
+$("fbSend").addEventListener("click", async () => {
+  if (!fbStars && !fbAgain && !$("fbText").value.trim()) return;
+  $("fbSend").disabled = true;
+  try {
+    const r = await fetch(PROXY + "/feedback", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ stars: fbStars, again: fbAgain, text: $("fbText").value.trim(), lang: LANG }) });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    $("fbMsg").textContent = t("fbThanks"); $("fbMsg").hidden = false; store.set("rm_fbDone", true);
+    setTimeout(() => $("fbDlg").close(), 1500);
+  } catch (e) { $("fbMsg").textContent = t("fbFail"); $("fbMsg").hidden = false; $("fbSend").disabled = false; }
+});
+
 // ================= Rutas compartidas y retos por link =================
 async function openSharedSights(main) {
   const parts = main.split("lugares=")[1].split("_");
@@ -1667,6 +1731,8 @@ $("tipClose").addEventListener("click", () => { $("tip").hidden = true; store.se
 renderExplore(); renderPlan(); drawHistory(); setEndMode("loop");
 setSport(S.sport, S.sport !== "bike");
 openShared().then(shared => { gpsFirst = !shared; locate(false); });
+$("fbCard").hidden = !PROXY;
+if (store.get("rm_pingDay", "") !== ymd(Date.now())) { store.set("rm_pingDay", ymd(Date.now())); ping("open"); }
 </script>
 </body>
 </html>
