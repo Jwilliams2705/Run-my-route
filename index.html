@@ -133,6 +133,9 @@ dialog .check { display: flex; gap: 8px; align-items: center; font-weight: 600 }
 .sights img, .sights .ph { width: 56px; height: 56px; border-radius: 10px; object-fit: cover; background: var(--bg2); display: block }
 .sights b { display: block; font-size: 14px } .sights small { display: block; font-size: 12px; color: var(--muted) }
 .sights a { font-size: 12px; color: var(--accent); font-weight: 700 }
+.sightmark.must { background: #ffc23c; color: #14213d }
+.mustmark { width: 26px; height: 26px; border-radius: 50%; background: #fff; border: 2px solid #ffc23c; font-size: 13px; line-height: 22px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,.3) }
+.mustchip { background: color-mix(in srgb, var(--sun) 35%, var(--card)) }
 .sightmark { width: 24px; height: 24px; border-radius: 50%; background: var(--accent); color: #fff; border: 2px solid #fff; font: 700 12px/20px var(--f-body); text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,.3) }
 .modes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px }
 .mcard { border: 2px solid var(--line); background: var(--card); border-radius: 18px; padding: 14px 12px; text-align: left; display: grid; gap: 4px; align-content: start; transition: transform .15s, border-color .15s, box-shadow .15s }
@@ -247,6 +250,13 @@ window.addEventListener("error", function (e) {
     <div class="seg2" id="explore" hidden><button type="button" data-x="new" data-t="exNew"></button><button type="button" data-x="repeat" data-t="exRepeat"></button></div>
     <p class="note" id="histNote" hidden></p>
     <p class="note" id="modeNote"></p>
+    <div class="sec" id="mustBox" hidden>
+      <div class="h"><span data-t="mustTitle"></span></div>
+      <div class="search"><input id="q3" type="search" autocomplete="off" data-tp="mustPh" data-ta="mustPh"><ul class="qres" id="qres3" hidden></ul></div>
+      <div class="chips" id="mustList"></div>
+      <div class="chips"><button type="button" class="chip" id="mustTap" aria-pressed="false" data-t="mustTap"></button></div>
+      <p class="note" id="mustNote"></p>
+    </div>
   </section>
 
   <section class="sec">
@@ -466,6 +476,9 @@ const I = {
     prepCarbs: "Cena con carbohidratos (pasta, arroz) y duerme de 7 a 9 horas.", prepSleep: "Toma agua durante el día y duerme de 7 a 9 horas.", gear: "Ropa: {0}.", gRain: "chamarra ligera y gorra", gHot: "ropa ligera, gorra, lentes y bloqueador", gCold: "capas y guantes", gNight: "algo reflectante o una luz", gNormal: "ropa cómoda",
     lPrevHard: "El día anterior también es fuerte: hazlo más suave o muévelo para descansar.", lNextHard: "Al día siguiente también hay entreno fuerte: no te vacíes hoy.", lDouble: "Doble sesión: deja al menos 6 horas entre las dos y come en medio.",
     lRestGood: "Buen momento para descansar después del esfuerzo.", lTooMuch: "Muchos días fuertes juntos: considera cambiar uno por rodaje suave.", pRest: "Descanso: estira o camina 15 a 20 min, toma agua y duerme bien.",
+    mustTitle: "Lugares que quiero visitar (opcional)", mustPh: "Busca un lugar: museo, parque, mirador", mustHint: "Agrega hasta 5 lugares que quieras conocer y la ruta pasará por todos.", mustNote: "La ruta pasará por tus {0} lugares ⭐ y completará tus km con otros cercanos.", mustNote1: "La ruta pasará por tu lugar ⭐ y completará tus km con otros cercanos.",
+    mustTap: "📍 Tocar el mapa para agregar", mustTapOn: "Toca el mapa donde está tu lugar.", myPlace: "Mi lugar {0}", mustFull: "Máximo 5 lugares.",
+    mustLonger: "Para pasar por todos tus lugares la ruta necesita unos {0} km, así que te armé la más corta posible.", mustShorter: "Tus lugares están muy cerca: la ruta mide {0} km. Sube los km o agrega otro lugar.",
     viewMap: "Ver en el mapa ↑", toOptions: "Elegir ruta y empezar ↓",
     fbBtn: "Danos tu opinión", fbTitle: "¿Qué te pareció Ruta a Medida?", fbStars: "Califica la app", fbAgain: "¿La volverías a usar?", fbYes: "Sí", fbMaybe: "Tal vez", fbNo: "No", fbText: "¿Qué te gustó o qué mejorarías?", fbSend: "Enviar",
     fbThanks: "¡Gracias! Tu opinión nos ayuda a mejorar.", fbFail: "No se pudo enviar. Revisa tu conexión.", fbCard: "¿Nos ayudas? Estamos probando la app y tu opinión cuenta.",
@@ -540,6 +553,9 @@ const I = {
     prepCarbs: "Have a carb-rich dinner (pasta, rice) and sleep 7 to 9 hours.", prepSleep: "Drink water through the day and sleep 7 to 9 hours.", gear: "Clothes: {0}.", gRain: "light jacket and cap", gHot: "light clothes, cap, sunglasses and sunscreen", gCold: "layers and gloves", gNight: "something reflective or a light", gNormal: "comfortable clothes",
     lPrevHard: "The day before is also hard: go easier or move it to rest.", lNextHard: "The next day is also hard: don't empty the tank today.", lDouble: "Double session: leave at least 6 hours between them and eat in between.",
     lRestGood: "Good time to rest after the effort.", lTooMuch: "Lots of hard days together: consider swapping one for an easy run.", pRest: "Rest: stretch or walk 15 to 20 min, drink water and sleep well.",
+    mustTitle: "Places I want to visit (optional)", mustPh: "Search a place: museum, park, viewpoint", mustHint: "Add up to 5 places you want to see and the route will pass through all of them.", mustNote: "The route will pass through your {0} places ⭐ and fill your km with others nearby.", mustNote1: "The route will pass through your place ⭐ and fill your km with others nearby.",
+    mustTap: "📍 Tap the map to add", mustTapOn: "Tap the map where your place is.", myPlace: "My place {0}", mustFull: "5 places maximum.",
+    mustLonger: "To pass through all your places the route needs about {0} km, so here's the shortest one possible.", mustShorter: "Your places are very close together: the route is {0} km. Increase the km or add another place.",
     viewMap: "See on map ↑", toOptions: "Choose route and start ↓",
     fbBtn: "Give us feedback", fbTitle: "What did you think of Ruta a Medida?", fbStars: "Rate the app", fbAgain: "Would you use it again?", fbYes: "Yes", fbMaybe: "Maybe", fbNo: "No", fbText: "What did you like or what would you improve?", fbSend: "Send",
     fbThanks: "Thank you! Your feedback helps us improve.", fbFail: "Couldn't send it. Check your connection.", fbCard: "Can you help? We're testing the app and your opinion counts.",
@@ -587,7 +603,7 @@ const useProxy = () => !!PROXY && !rawKey();
 const S = {
   km: 8, mix: { plano: 70, ondulado: 20, subida: 5, bajada: 5 }, quiet: store.get("rm_quiet", false), routeMode: "sights", sightInfo: {}, wlang: LANG,
   start: null, here: null, routes: [], opt: 0, seedBase: 0, challenge: null,
-  endMode: "loop", end: null, tapFor: "start", explore: store.get("rm_explore", "new"), showHist: store.get("rm_hist", true), planDay: null, planUse: null,
+  endMode: "loop", end: null, tapFor: "start", explore: store.get("rm_explore", "new"), showHist: store.get("rm_hist", true), planDay: null, planUse: null, must: [],
   pace: store.get("rm_pace", 360), speed: store.get("rm_speed", 22), sport: store.get("rm_sport", "run"), bikeType: store.get("rm_bike", "cycling-regular"),
   voiceMode: store.get("rm_voicemode", store.get("rm_voice", true) ? "full" : "off"), name: store.get("rm_name", ""),
   run: null, follow: true
@@ -734,7 +750,7 @@ function locate(recenter) {
     $("gpsSub").textContent = t("searchOrTap");
   }, { enableHighAccuracy: true, maximumAge: 5000, timeout: 30000 });
 }
-map.on("click", e => { if (S.run) return; if (S.endMode === "point" && S.tapFor === "end") setEnd(e.latlng.lat, e.latlng.lng, ""); else setStart(e.latlng.lat, e.latlng.lng, "manual"); });
+map.on("click", e => { if (S.run) return; if (S.tapFor === "must" && S.routeMode === "sights") { addMust(e.latlng.lat, e.latlng.lng, ""); return; } if (S.endMode === "point" && S.tapFor === "end") setEnd(e.latlng.lat, e.latlng.lng, ""); else setStart(e.latlng.lat, e.latlng.lng, "manual"); });
 $("locate").addEventListener("click", () => {
   if (S.here) { setStart(S.here.lat, S.here.lng, "gps"); map.setView([S.here.lat, S.here.lng], 15); }
   else locate(true);
@@ -768,6 +784,33 @@ function hookSearch(inp, list, pick) {
 }
 hookSearch($("q"), $("qres"), (lat, lng, name) => { setStart(lat, lng, "search", name); map.setView([lat, lng], 15); });
 hookSearch($("q2"), $("qres2"), (lat, lng, name) => { setEnd(lat, lng, name); map.setView([lat, lng], 15); });
+hookSearch($("q3"), $("qres3"), (lat, lng, name) => { addMust(lat, lng, name); map.panTo([lat, lng]); });
+
+// ================= Lugares que el usuario quiere visitar =================
+let mustLayer = null;
+function addMust(lat, lng, name) {
+  if (S.must.length >= 5) { $("mustNote").textContent = t("mustFull"); return; }
+  S.must.push({ id: "u" + lat.toFixed(4) + "_" + lng.toFixed(4), title: name || t("myPlace", S.must.length + 1), lat, lon: lng, score: 5, must: true });
+  renderMust();
+}
+function renderMust() {
+  $("mustBox").hidden = S.routeMode !== "sights";
+  $("mustList").innerHTML = S.must.map((m, i) => '<button type="button" class="chip mustchip" data-mi="' + i + '">⭐ ' + esc(shortTitle(m.title)) + ' ✕</button>').join("");
+  $("mustNote").textContent = S.tapFor === "must" ? t("mustTapOn") : S.must.length === 1 ? t("mustNote1") : S.must.length ? t("mustNote", S.must.length) : t("mustHint");
+  $("mustTap").setAttribute("aria-pressed", String(S.tapFor === "must"));
+  $("q3").disabled = S.must.length >= 5;
+  if (mustLayer) mustLayer.remove();
+  mustLayer = L.layerGroup().addTo(map);
+  if (S.routeMode === "sights") S.must.forEach(m => L.marker([m.lat, m.lon], { zIndexOffset: 450, icon: L.divIcon({ className: "", html: '<div class="mustmark">⭐</div>', iconSize: [26, 26] }) }).bindTooltip(shortTitle(m.title)).addTo(mustLayer));
+}
+$("mustList").addEventListener("click", e => { const b = e.target.closest("[data-mi]"); if (b) { S.must.splice(+b.dataset.mi, 1); renderMust(); } });
+$("mustTap").addEventListener("click", () => { S.tapFor = S.tapFor === "must" ? (S.endMode === "point" ? "end" : "start") : "must"; renderMust(); renderEnd(); });
+// Puntos de relleno alrededor de la salida, para alargar la ruta cuando no hay más lugares conocidos.
+function virtualPoints(L) {
+  const c = S.start, kx = Math.cos(c.lat * Math.PI / 180) * 111320, out = [];
+  [.12, .2, .3].forEach((f, j) => { for (let i = 0; i < 12; i++) { const a = i / 12 * Math.PI * 2, d = L * f; out.push({ id: "v" + j + "_" + i, title: "", lat: c.lat + Math.sin(a) * d / 110540, lon: c.lng + Math.cos(a) * d / kx, score: 1, virtual: true }); } });
+  return out;
+}
 
 // ================= Formulario =================
 $("terr").innerHTML = TYPES.map(x => '<div class="trow" style="--c:var(--' + x.k + ')"><span class="sw"></span><span><b>' + x.name + '</b><small>' + x.desc + '</small></span>' +
@@ -796,6 +839,7 @@ function setMode(mode) {
   S.routeMode = mode === "sights" ? "sights" : "train";
   $("mode").querySelectorAll("[data-m]").forEach(x => x.setAttribute("aria-pressed", String(x.dataset.m === S.routeMode)));
   $("quietWrap").hidden = S.routeMode === "sights"; $("quietChk").checked = S.quiet;
+  if (typeof renderMust === "function" && $("mustBox")) try { renderMust(); } catch (e) {}
   $("modeNote").textContent = S.routeMode === "sights" ? t("sightsNote") : S.quiet ? t(bike() ? "quietNoteBike" : "quietNoteRun") : t(bike() ? "trainNoteBike" : "trainNoteRun");
 }
 $("mode").addEventListener("click", e => { const b = e.target.closest("[data-m]"); if (b) setMode(b.dataset.m); });
@@ -878,7 +922,9 @@ async function createRoutes() {
   let ok = [], note = "", results = [];
   if (S.routeMode === "sights") {
     try { ok = await createSightRoutes(); } catch (e) { ok = []; }
+    note = sightNote;
     if (!ok.length) note = t("noSightsFallback");
+    else if (note) note += " ";
   }
   if (!ok.length) {
     showMsg(note + t("findingRoutes"));
@@ -927,16 +973,18 @@ async function findSights(lat, lng, radius, lang) {
   return out.slice(0, 20);
 }
 // Elige grupos de 1 a 4 lugares que, unidos en una vuelta, den más o menos la distancia pedida.
-function pickLoops(sights, L, factor, avoid) {
+function pickLoops(sights, L, factor, avoid, forced) {
+  forced = forced || [];
   const st = S.start, en = endPt(), s0 = [st.lng, st.lat], s1 = [en.lng, en.lat], target = L / factor, rnd = rng(7 + L + S.seedBase * 31), kx = Math.cos(st.lat * Math.PI / 180);
   const ang = s => Math.atan2(s.lat - st.lat, (s.lon - st.lng) * kx);
   // De ida (A a B): los lugares en orden de avance hacia la meta.
   const along = s => (s.lon - st.lng) * kx * (en.lng - st.lng) * kx + (s.lat - st.lat) * (en.lat - st.lat);
   const perim = set => { let p = 0, prev = s0; set.forEach(s => { const c = [s.lon, s.lat]; p += haversine(prev, c); prev = c; }); return p + haversine(prev, s1); };
   const n = sights.length, seen = {}, cands = [];
-  for (let k0 = 0; k0 < 600 && n; k0++) {
-    const k = 1 + Math.floor(rnd() * Math.min(4, n)), set = [];
-    while (set.length < k) { const s = sights[Math.floor(rnd() * n)]; if (set.indexOf(s) < 0) set.push(s); }
+  for (let k0 = 0; k0 < 600 && (n || forced.length); k0++) {
+    // Con lugares elegidos por el usuario: siempre van, y se agregan de 0 a 3 más para completar los km.
+    const k = forced.length ? Math.floor(rnd() * Math.min(4, n + 1)) : 1 + Math.floor(rnd() * Math.min(4, n)), set = forced.slice();
+    while (set.length < forced.length + k) { const s = sights[Math.floor(rnd() * n)]; if (set.indexOf(s) < 0) set.push(s); }
     // En orden alrededor de la salida, para que la vuelta no se cruce.
     set.sort(oneWay() ? (a, b) => along(a) - along(b) : (a, b) => ang(a) - ang(b));
     const key = set.map(s => s.id).sort().join(",");
@@ -947,36 +995,45 @@ function pickLoops(sights, L, factor, avoid) {
   }
   cands.sort((a, b) => b.score - a.score);
   const picked = [];
-  cands.forEach(c => { if (picked.length < 3 && !picked.some(p => c.set.filter(s => p.set.indexOf(s) >= 0).length * 2 > Math.min(c.set.length, p.set.length))) picked.push(c); });
+  cands.forEach(c => { if (picked.length < 3 && !picked.some(p => c.set.filter(s => forced.indexOf(s) < 0 && p.set.indexOf(s) >= 0).length * 2 > Math.min(c.set.length, p.set.length) - forced.length)) picked.push(c); });
+  // Si no cabe en la distancia pedida, al menos una ruta que pase por todos los lugares elegidos.
+  if (!picked.length && forced.length && !avoid.forced) { const set = forced.slice().sort(oneWay() ? (a, b) => along(a) - along(b) : (a, b) => ang(a) - ang(b)); picked.push({ set, key: "forced", perim: perim(set), score: 0 }); }
   return picked;
 }
 function placeSights(r, set) {
   return set.map(s => {
     let best = 1e9, along = 0;
     for (let i = 0; i < r.coords.length - 1; i++) { const pr = project([s.lon, s.lat], r.coords[i], r.coords[i + 1]); if (pr.d < best) { best = pr.d; along = r.cum[i] + pr.t * (r.cum[i + 1] - r.cum[i]); } }
-    return { id: s.id, title: s.title, lat: s.lat, lon: s.lon, along: Math.round(along) };
+    return { id: s.id, title: s.title, lat: s.lat, lon: s.lon, along: Math.round(along), must: !!s.must };
   }).sort((a, b) => a.along - b.along);
 }
 async function fetchVia(pick) {
   const s0 = [S.start.lng, S.start.lat], e = endPt(), wps = [s0].concat(pick.set.map(s => [s.lon, s.lat]), [[e.lng, e.lat]]);
-  const f = await orsRoute({ coordinates: wps });
+  const f = await orsRoute({ coordinates: wps, radiuses: wps.map(() => 800) });
   const r = routeFromFeature(f, { straight: pick.perim, wps });
-  r.sights = placeSights(r, pick.set);
+  r.sights = placeSights(r, pick.set.filter(s => !s.virtual));
   r.rank = r.match + 6 * r.sights.length + freshBonus(r);
   return r;
 }
+let sightNote = "";
 async function createSightRoutes() {
+  sightNote = "";
   showMsg(t("findingPlaces"));
   const L = S.km * 1000, other = LANG === "es" ? "en" : "es", E = endPt(), cLat = (S.start.lat + E.lat) / 2, cLng = (S.start.lng + E.lng) / 2;
   // Primero en el idioma del teléfono; si hay pocos lugares, también en el otro idioma.
   let sights = await findSights(cLat, cLng, L * .45, LANG); S.wlang = LANG;
   if (sights.length < 4) { const o = await findSights(cLat, cLng, L * .45, other).catch(() => []); if (o.length > sights.length) { sights = o; S.wlang = other; } }
-  if (!sights.length) return [];
-  showMsg(t("buildingVia", esc(shortTitle(sights[0].title))));
+  const forced = S.must.slice();
+  if (forced.length) {
+    // Sin repetir los lugares que el usuario ya eligió, y con puntos de relleno por si faltan lugares.
+    sights = sights.filter(x => !forced.some(m => haversine([m.lon, m.lat], [x.lon, x.lat]) < 200)).concat(virtualPoints(L));
+  }
+  if (!sights.length && !forced.length) return [];
+  showMsg(t("buildingVia", esc(shortTitle((forced[0] || sights[0]).title))));
   let factor = bike() ? 1.25 : 1.3, out = [];
   const avoid = {};
   for (let round = 0; round < 2; round++) {
-    const picks = pickLoops(sights, L, factor, avoid);
+    const picks = pickLoops(sights, L, factor, avoid, forced);
     if (!picks.length) break;
     picks.forEach(p => avoid[p.key] = 1);
     const rs = (await Promise.allSettled(picks.map(fetchVia))).filter(x => x.status === "fulfilled").map(x => x.value);
@@ -986,10 +1043,15 @@ async function createSightRoutes() {
     factor = rs.reduce((a, x) => a + x.total / x.straight, 0) / rs.length;
   }
   // Solo deja rutas cuya distancia quede cerca de lo pedido.
-  return out.filter(x => Math.abs(x.total - L) / L < .25);
+  const near = out.filter(x => Math.abs(x.total - L) / L < .25);
+  if (near.length || !forced.length || !out.length) return near;
+  // Con lugares elegidos: si no se puede llegar a los km, se avisa y se da la más cercana.
+  const best = out.sort((a, b) => Math.abs(a.total - L) - Math.abs(b.total - L))[0];
+  sightNote = t(best.total > L ? "mustLonger" : "mustShorter", fmtKm(best.total));
+  return [best];
 }
 async function loadSightInfo() {
-  const ids = [...new Set(S.routes.flatMap(r => (r.sights || []).map(s => s.id)))].filter(id => !(id in S.sightInfo)).slice(0, 20);
+  const ids = [...new Set(S.routes.flatMap(r => (r.sights || []).map(s => s.id)))].filter(id => typeof id === "number" && !(id in S.sightInfo)).slice(0, 20);
   if (!ids.length) return;
   try {
     const j = await getJSON(wapi() + "action=query&prop=extracts%7Cpageimages&exintro=1&explaintext=1&exsentences=2&exlimit=20&piprop=thumbnail&pithumbsize=160&pageids=" + ids.join("%7C"));
@@ -1004,7 +1066,7 @@ function renderSights() {
   if (!list || !list.length) return;
   $("sights").innerHTML = list.map((s, i) => {
     const inf = S.sightInfo[s.id] || {};
-    return '<li>' + (inf.thumb ? '<img src="' + esc(inf.thumb) + '" alt="" loading="lazy" onerror="this.remove()">' : '<span class="ph"></span>') + '<div><b>' + (i + 1) + '. ' + esc(shortTitle(s.title)) + '</b><small>km ' + (s.along / 1000).toFixed(1) + (inf.extract ? ' · ' + esc(firstSentence(inf.extract)) : '') + '</small><a href="https://' + S.wlang + '.wikipedia.org/?curid=' + s.id + '" target="_blank" rel="noopener">' + t("readMore") + '</a></div></li>';
+    return '<li>' + (inf.thumb ? '<img src="' + esc(inf.thumb) + '" alt="" loading="lazy" onerror="this.remove()">' : '<span class="ph"></span>') + '<div><b>' + (i + 1) + '. ' + (s.must ? '⭐ ' : '') + esc(shortTitle(s.title)) + '</b><small>km ' + (s.along / 1000).toFixed(1) + (inf.extract ? ' · ' + esc(firstSentence(inf.extract)) : '') + '</small>' + (typeof s.id === "number" ? '<a href="https://' + S.wlang + '.wikipedia.org/?curid=' + s.id + '" target="_blank" rel="noopener">' + t("readMore") + '</a>' : '') + '</div></li>';
   }).join("");
 }
 
@@ -1117,7 +1179,7 @@ function drawRoutes(fit) {
     const p = rt.at(d).ll;
     L.marker([p[1], p[0]], { interactive: false, icon: L.divIcon({ className: "", html: '<div class="kmmark">' + Math.round(d / 1000) + '</div>', iconSize: [22, 22] }) }).addTo(routeLayer);
   }
-  (rt.sights || []).forEach((s, i) => L.marker([s.lat, s.lon], { zIndexOffset: 400, icon: L.divIcon({ className: "", html: '<div class="sightmark">' + (i + 1) + '</div>', iconSize: [24, 24] }) }).bindTooltip(shortTitle(s.title)).addTo(routeLayer));
+  (rt.sights || []).forEach((s, i) => L.marker([s.lat, s.lon], { zIndexOffset: 400, icon: L.divIcon({ className: "", html: '<div class="sightmark' + (s.must ? ' must' : '') + '">' + (i + 1) + '</div>', iconSize: [24, 24] }) }).bindTooltip(shortTitle(s.title)).addTo(routeLayer));
   if (fit) map.fitBounds(L.polyline(rt.coords.map(c => [c[1], c[0]])).getBounds(), { padding: [30, 30] });
 }
 
@@ -1170,10 +1232,11 @@ $("save").addEventListener("click", () => {
   list.unshift(packRoute(rt, t("routeOf", fmtKm(rt.total)) + " · " + dateFmt(Date.now(), { day: "numeric", month: "short" })));
   showMsg(store.set("rm_saved", list.slice(0, 15)) ? t("savedOk") : t("saveFail"), false);
 });
-const canLink = rt => !!(rt.seed || (rt.sights && rt.sights.length) || (rt.wps && oneWay()));
+const hasMust = rt => (rt.sights || []).some(x => x.must);
+const canLink = rt => !!(rt.seed || (rt.sights && rt.sights.length) || (rt.wps && (oneWay() || hasMust(rt))));
 function shareUrl(rt) {
   const base = location.origin + location.pathname, bk = bike() ? BIKE_TYPES.indexOf(S.bikeType) + 1 : 0;
-  if (oneWay() && rt.wps) return base + "#via=" + [S.wlang, bk, S.km, S.mix.plano, S.mix.ondulado, S.mix.subida, S.mix.bajada, S.quiet ? 1 : 0, rt.wps.length].concat(rt.wps.flatMap(q => [q[1].toFixed(5), q[0].toFixed(5)]), (rt.sights || []).map(x => x.id)).join("_");
+  if (rt.wps && (oneWay() || hasMust(rt))) return base + "#via=" + [S.wlang, bk, S.km, S.mix.plano, S.mix.ondulado, S.mix.subida, S.mix.bajada, S.quiet ? 1 : 0, rt.wps.length].concat(rt.wps.flatMap(q => [q[1].toFixed(5), q[0].toFixed(5)]), (rt.sights || []).filter(x => typeof x.id === "number").map(x => x.id)).join("_");
   if (rt.sights && rt.sights.length) return base + "#lugares=" + [S.wlang, bk, S.km, S.mix.plano, S.mix.ondulado, S.mix.subida, S.mix.bajada, S.start.lat.toFixed(5), S.start.lng.toFixed(5)].concat(rt.sights.map(s => s.id)).join("_");
   return base + "#ruta=" + [S.start.lat.toFixed(5), S.start.lng.toFixed(5), S.km, S.mix.plano, S.mix.ondulado, S.mix.subida, S.mix.bajada, S.quiet ? 1 : 0, rt.seed, rt.points, rt.factor, bk].join("_");
 }
@@ -1703,7 +1766,7 @@ async function openSharedVia(main) {
   S.wlang = lang;
   if (v[0] > 0) { S.bikeType = BIKE_TYPES[v[0] - 1] || BIKE_TYPES[0]; setSport("bike", true); } else setSport("run", true);
   S.km = v[1]; TYPES.forEach((x, i) => S.mix[x.k] = v[2 + i]); S.quiet = v[6] === 1; setMode(ids.length ? "sights" : "train"); renderSetup();
-  setStart(pts[0][1], pts[0][0], "shared", t("sharedPoint")); setEnd(pts[n - 1][1], pts[n - 1][0], t("sharedEnd")); setEndMode("point");
+  setStart(pts[0][1], pts[0][0], "shared", t("sharedPoint")); setEnd(pts[n - 1][1], pts[n - 1][0], t("sharedEnd")); setEndMode(haversine(pts[0], pts[n - 1]) > 150 ? "point" : "loop");
   map.setView([pts[0][1], pts[0][0]], 14);
   showMsg(t("loadingShared"));
   try {
