@@ -449,7 +449,7 @@ const I = {
     needStart: "Activa tu ubicación, busca un lugar o toca el mapa para elegir desde dónde sales.", findingRoutes: "Buscando rutas reales a tu alrededor. Tarda unos segundos.",
     findingPlaces: "Buscando lugares interesantes cerca de ti…", buildingVia: "Armando rutas que pasen por lugares como {0}. Tarda unos segundos.", noSightsFallback: "No encontré lugares conocidos a esa distancia, así que te armé una ruta para entrenar. ",
     loadingShared: "Cargando la ruta que te compartieron…", sharedReady: "Esta es la ruta que te compartieron.",
-    errNet: "No hay conexión a internet. Conéctate y vuelve a intentar. Tus rutas guardadas sí funcionan sin internet.", errKey: "La clave de rutas no es válida. Revísala en Ajustes.", errLimit: "Se usaron muchas búsquedas seguidas. Espera un minuto y vuelve a intentar.", errNone: "No se encontraron rutas desde este punto. Prueba moverte a una calle cercana o cambia los kilómetros.",
+    errNet: "No hay conexión a internet. Conéctate y vuelve a intentar. Tus rutas guardadas sí funcionan sin internet.", errKey: "La clave de rutas no es válida. Revísala en Ajustes.", errQuota: "El servicio de rutas llegó a su límite por ahora. Intenta de nuevo en un rato; tus rutas guardadas sí funcionan.", errLimit: "Se usaron muchas búsquedas seguidas. Espera un minuto y vuelve a intentar.", errNone: "No se encontraron rutas desde este punto. Prueba moverte a una calle cercana o cambia los kilómetros.",
     vStart: "Empieza tu ruta de {0}. Ve al punto verde.", vOff: "Te saliste de la ruta. Regresa a la línea de color.", vKm: "Kilómetro {0}. Ritmo {1}.", vKmBike: "Kilómetro {0}. Velocidad {1} kilómetros por hora.",
     vHill: "En {0}, {1} de {2}.", vPlaceIn: "En {0}: {1}.", vPlaceNow: "Estás pasando por {0}.", vTurn: "En {0}, {1}.", vDone: "Ruta terminada. Excelente trabajo.", vEnd: "Carrera terminada.", vPause: "Pausa.", vResume: "Seguimos.",
     vGhost: "Vas {0} adelante de {1}.", vGhostB: "Vas {0} atrás de {1}.", meters: "{0} metros", km1: "1 kilómetro", kms: "{0} kilómetros", paceSpeech: "{0} con {1}",
@@ -476,6 +476,7 @@ const I = {
     prepCarbs: "Cena con carbohidratos (pasta, arroz) y duerme de 7 a 9 horas.", prepSleep: "Toma agua durante el día y duerme de 7 a 9 horas.", gear: "Ropa: {0}.", gRain: "chamarra ligera y gorra", gHot: "ropa ligera, gorra, lentes y bloqueador", gCold: "capas y guantes", gNight: "algo reflectante o una luz", gNormal: "ropa cómoda",
     lPrevHard: "El día anterior también es fuerte: hazlo más suave o muévelo para descansar.", lNextHard: "Al día siguiente también hay entreno fuerte: no te vacíes hoy.", lDouble: "Doble sesión: deja al menos 6 horas entre las dos y come en medio.",
     lRestGood: "Buen momento para descansar después del esfuerzo.", lTooMuch: "Muchos días fuertes juntos: considera cambiar uno por rodaje suave.", pRest: "Descanso: estira o camina 15 a 20 min, toma agua y duerme bien.",
+    terrainLimit: "Cerca de ti, a esta distancia, el terreno no da exactamente lo que pediste. Lo más parecido que encontré: {0}% plano, {1}% ondulado, {2}% subida y {3}% bajada.",
     mustTitle: "Lugares que quiero visitar (opcional)", mustPh: "Busca un lugar: museo, parque, mirador", mustHint: "Agrega hasta 5 lugares que quieras conocer y la ruta pasará por todos.", mustNote: "La ruta pasará por tus {0} lugares ⭐ y completará tus km con otros cercanos.", mustNote1: "La ruta pasará por tu lugar ⭐ y completará tus km con otros cercanos.",
     mustTap: "📍 Tocar el mapa para agregar", mustTapOn: "Toca el mapa donde está tu lugar.", myPlace: "Mi lugar {0}", mustFull: "Máximo 5 lugares.",
     mustLonger: "Para pasar por todos tus lugares la ruta necesita unos {0} km, así que te armé la más corta posible.", mustShorter: "Tus lugares están muy cerca: la ruta mide {0} km. Sube los km o agrega otro lugar.",
@@ -526,7 +527,7 @@ const I = {
     needStart: "Turn on your location, search a place or tap the map to choose where you start.", findingRoutes: "Finding real routes around you. This takes a few seconds.",
     findingPlaces: "Looking for interesting places near you…", buildingVia: "Building routes through places like {0}. This takes a few seconds.", noSightsFallback: "No well-known places at that distance, so here's a training route. ",
     loadingShared: "Loading the route shared with you…", sharedReady: "This is the route shared with you.",
-    errNet: "No internet connection. Connect and try again. Your saved routes still work offline.", errKey: "The routing key is not valid. Check it in Settings.", errLimit: "Too many searches in a row. Wait a minute and try again.", errNone: "No routes found from this point. Move to a nearby street or change the distance.",
+    errNet: "No internet connection. Connect and try again. Your saved routes still work offline.", errKey: "The routing key is not valid. Check it in Settings.", errQuota: "The routing service has reached its limit for now. Try again in a while; your saved routes still work.", errLimit: "Too many searches in a row. Wait a minute and try again.", errNone: "No routes found from this point. Move to a nearby street or change the distance.",
     vStart: "Starting your route: {0}. Head to the green dot.", vOff: "You're off the route. Head back to the colored line.", vKm: "Kilometer {0}. Pace {1}.", vKmBike: "Kilometer {0}. Speed {1} kilometers per hour.",
     vHill: "In {0}, {1} for {2}.", vPlaceIn: "In {0}: {1}.", vPlaceNow: "You're passing {0}.", vTurn: "In {0}, {1}.", vDone: "Route complete. Great job.", vEnd: "Workout finished.", vPause: "Paused.", vResume: "Resuming.",
     vGhost: "You're {0} ahead of {1}.", vGhostB: "You're {0} behind {1}.", meters: "{0} meters", km1: "1 kilometer", kms: "{0} kilometers", paceSpeech: "{0}:{1}",
@@ -553,6 +554,7 @@ const I = {
     prepCarbs: "Have a carb-rich dinner (pasta, rice) and sleep 7 to 9 hours.", prepSleep: "Drink water through the day and sleep 7 to 9 hours.", gear: "Clothes: {0}.", gRain: "light jacket and cap", gHot: "light clothes, cap, sunglasses and sunscreen", gCold: "layers and gloves", gNight: "something reflective or a light", gNormal: "comfortable clothes",
     lPrevHard: "The day before is also hard: go easier or move it to rest.", lNextHard: "The next day is also hard: don't empty the tank today.", lDouble: "Double session: leave at least 6 hours between them and eat in between.",
     lRestGood: "Good time to rest after the effort.", lTooMuch: "Lots of hard days together: consider swapping one for an easy run.", pRest: "Rest: stretch or walk 15 to 20 min, drink water and sleep well.",
+    terrainLimit: "Around you, at this distance, the terrain doesn't give exactly what you asked for. The closest I found: {0}% flat, {1}% rolling, {2}% uphill and {3}% downhill.",
     mustTitle: "Places I want to visit (optional)", mustPh: "Search a place: museum, park, viewpoint", mustHint: "Add up to 5 places you want to see and the route will pass through all of them.", mustNote: "The route will pass through your {0} places ⭐ and fill your km with others nearby.", mustNote1: "The route will pass through your place ⭐ and fill your km with others nearby.",
     mustTap: "📍 Tap the map to add", mustTapOn: "Tap the map where your place is.", myPlace: "My place {0}", mustFull: "5 places maximum.",
     mustLonger: "To pass through all your places the route needs about {0} km, so here's the shortest one possible.", mustShorter: "Your places are very close together: the route is {0} km. Increase the km or add another place.",
@@ -648,11 +650,17 @@ function analyze(coords) {
     const f = (d - cum[i - 1]) / (cum[i] - cum[i - 1] || 1);
     return { e: (coords[i - 1][2] || 0) + f * ((coords[i][2] || 0) - (coords[i - 1][2] || 0)), ll: [coords[i - 1][0] + f * (coords[i][0] - coords[i - 1][0]), coords[i - 1][1] + f * (coords[i][1] - coords[i - 1][1])] };
   };
+  // Los datos de altura de los mapas tienen "ruido" de unos metros: se suaviza cada 25 m con una ventana de 150 m,
+  // para que una calle plana no se lea como ondulada. Las cuestas reales sí se conservan.
+  const STEP = 25, raw = [];
+  for (let d = 0; d <= total; d += STEP) raw.push(at(d).e);
+  const sm = raw.map((_, i) => { let t0 = 0, n = 0; for (let k = Math.max(0, i - 3); k <= Math.min(raw.length - 1, i + 3); k++) { t0 += raw[k]; n++; } return t0 / n; });
+  const se = d => { const x = d / STEP, i = Math.min(sm.length - 2, Math.floor(x)); if (sm.length < 2 || i < 0) return sm[0] || 0; return sm[i] + (x - i) * (sm[i + 1] - sm[i]); };
   const bins = [];
   for (let d = 0; d < total; d += BIN) {
-    const d2 = Math.min(total, d + BIN), a = at(d), b = at(d2), g = (b.e - a.e) / (d2 - d || 1);
+    const d2 = Math.min(total, d + BIN), a = at(d), b = at(d2), e0 = se(d), e1 = se(d2), g = (e1 - e0) / (d2 - d || 1);
     const ty = g >= STEEP ? "subida" : g <= -STEEP ? "bajada" : Math.abs(g) < FLAT ? "plano" : "ondulado";
-    bins.push({ from: d, to: d2, e0: a.e, e1: b.e, t: ty, a: a.ll, b: b.ll });
+    bins.push({ from: d, to: d2, e0, e1, t: ty, a: a.ll, b: b.ll });
   }
   // Tramos seguidos del mismo tipo (para los avisos al correr).
   const segs = [];
@@ -909,7 +917,105 @@ async function createOneWay() {
   return near.length ? near : out.sort((a, b) => Math.abs(a.total - L) - Math.abs(b.total - L)).slice(0, 3);
 }
 function showMsg(text, isErr) { $("msg").hidden = !text; $("msg").innerHTML = text || ""; $("msg").classList.toggle("err", !!isErr); }
-function errText(st) { return st === 0 ? t("errNet") : st === 401 || st === 403 ? t("errKey") : st === 429 ? t("errLimit") : t("errNone"); }
+function errText(st) { return st === 0 ? t("errNet") : st === 401 ? t("errKey") : st === 403 ? t("errQuota") : st === 429 ? t("errLimit") : t("errNone"); }
+// ================= Terreno exacto: mapa de alturas y rutas planeadas =================
+// Antes de pedir rutas, se mide la altura del terreno alrededor (196 puntos) para saber dónde está
+// lo plano y dónde están las subidas. Con eso se arman vueltas a propósito por las zonas que encajan
+// con el terreno pedido, y solo las mejores se piden al servicio de rutas.
+const TG = { key: "", grid: null };
+async function terrainGrid(c, R) {
+  const key = c.lat.toFixed(3) + "," + c.lng.toFixed(3) + "," + Math.round(R / 300);
+  if (TG.key === key && TG.grid) return TG.grid;
+  const N = 14, kx = Math.cos(c.lat * Math.PI / 180) * 111320, lats = [], lngs = [];
+  for (let i = 0; i < N; i++) for (let j = 0; j < N; j++) { lats.push((c.lat + (-R + 2 * R * i / (N - 1)) / 110540).toFixed(5)); lngs.push((c.lng + (-R + 2 * R * j / (N - 1)) / kx).toFixed(5)); }
+  const url = (a, b) => "https://api.open-meteo.com/v1/elevation?latitude=" + lats.slice(a, b).join(",") + "&longitude=" + lngs.slice(a, b).join(",");
+  const parts = await Promise.all([getJSON(url(0, 98), 10000), getJSON(url(98, 196), 10000)]);
+  const e = (parts[0].elevation || []).concat(parts[1].elevation || []);
+  if (e.length !== N * N) throw new Error("elev");
+  const grid = { N, R, c, kx, e, at(lng, lat) {
+    const y = ((lat - c.lat) * 110540 + R) / (2 * R) * (N - 1), x = ((lng - c.lng) * kx + R) / (2 * R) * (N - 1);
+    const xi = Math.max(0, Math.min(N - 2, Math.floor(x))), yi = Math.max(0, Math.min(N - 2, Math.floor(y)));
+    const fx = Math.max(0, Math.min(1, x - xi)), fy = Math.max(0, Math.min(1, y - yi)), g = (a, b) => e[a * N + b];
+    return g(yi, xi) * (1 - fx) * (1 - fy) + g(yi, xi + 1) * fx * (1 - fy) + g(yi + 1, xi) * (1 - fx) * fy + g(yi + 1, xi + 1) * fx * fy;
+  }, inside(lng, lat) { return Math.abs((lng - c.lng) * kx) <= R && Math.abs((lat - c.lat) * 110540) <= R; } };
+  TG.key = key; TG.grid = grid;
+  return grid;
+}
+// Qué tanto se parecería una vuelta en línea recta al terreno pedido (sirve para ordenar, no es exacto).
+function predictMatch(grid, pts) {
+  const real = { plano: 0, ondulado: 0, subida: 0, bajada: 0 }; let tot = 0;
+  for (let i = 1; i < pts.length; i++) {
+    const a = pts[i - 1], b = pts[i], d = haversine(a, b), n = Math.max(1, Math.round(d / 100)), seg = d / n;
+    let pe = grid.at(a[0], a[1]);
+    for (let k = 1; k <= n; k++) {
+      const f = k / n, e2 = grid.at(a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f), g = (e2 - pe) / (seg || 1);
+      real[g >= STEEP ? "subida" : g <= -STEEP ? "bajada" : Math.abs(g) < FLAT ? "plano" : "ondulado"] += seg; tot += seg; pe = e2;
+    }
+  }
+  let diff = 0; TYPES.forEach(x => diff += Math.abs(real[x.k] / (tot || 1) * 100 - S.mix[x.k]));
+  return 100 - diff / 2;
+}
+// Elige propuestas que vayan en direcciones distintas, para no dar tres rutas casi iguales.
+function diverse(cands, max, minDeg) {
+  cands.sort((a, b) => b.pred - a.pred);
+  const out = [];
+  cands.forEach(c => { if (out.length < max && !out.some(o => Math.abs(((c.ang - o.ang) * 180 / Math.PI + 540) % 360 - 180) < minDeg)) out.push(c); });
+  return out;
+}
+// Vueltas que salen y regresan al mismo punto: 2 o 3 puntos de paso alrededor de la salida.
+function loopCandidates(grid, A, target, seed) {
+  const rnd = rng(11 + seed + S.seedBase * 53), kx = grid.kx, cands = [];
+  const per = arr => { let p = 0, prev = [0, 0]; arr.forEach(q => { p += Math.hypot(q[0] - prev[0], q[1] - prev[1]); prev = q; }); return p + Math.hypot(prev[0], prev[1]); };
+  for (let it = 0; it < 1500; it++) {
+    const m = 2 + Math.floor(rnd() * 2), base = rnd() * Math.PI * 2, step = Math.PI * 2 / (m + 1);
+    const unit = [];
+    for (let i = 0; i < m; i++) { const a = base + (i + rnd() * .6) * step, r = .4 + rnd() * .6; unit.push([Math.cos(a) * r, Math.sin(a) * r]); }
+    const s = target / per(unit), wps = unit.map(q => [A[0] + q[0] * s / kx, A[1] + q[1] * s / 110540]);
+    if (wps.some(w => !grid.inside(w[0], w[1]))) continue;
+    const full = [A].concat(wps, [A]), cx = unit.reduce((t, q) => t + q[0], 0), cy = unit.reduce((t, q) => t + q[1], 0);
+    cands.push({ wps: full, straight: target, pred: predictMatch(grid, full), ang: Math.atan2(cy, cx) });
+  }
+  return diverse(cands, 8, 35);
+}
+// De A a B: un punto de paso sobre la elipse entre salida y meta, en muchas direcciones.
+function abCandidates(grid, A, B, P) {
+  const kx = grid.kx, bx = (B[0] - A[0]) * kx, by = (B[1] - A[1]) * 110540, c = Math.hypot(bx, by), ux = bx / c, uy = by / c;
+  const a = Math.max(P, c * 1.05) / 2, b = Math.sqrt(Math.max(1, a * a - c * c / 4)), cands = [];
+  for (let deg = -165; deg <= 180; deg += 15) {
+    const th = deg * Math.PI / 180, wx = bx / 2 + a * Math.cos(th) * ux - b * Math.sin(th) * uy, wy = by / 2 + a * Math.cos(th) * uy + b * Math.sin(th) * ux;
+    const W = [A[0] + wx / kx, A[1] + wy / 110540];
+    if (!grid.inside(W[0], W[1])) continue;
+    const full = [A, W, B];
+    cands.push({ wps: full, straight: haversine(A, W) + haversine(W, B), pred: predictMatch(grid, full), ang: th });
+  }
+  return diverse(cands, 8, 30);
+}
+async function fetchWps(p) {
+  const body = { coordinates: p.wps, radiuses: p.wps.map(() => 500) };
+  if (S.quiet && !bike()) body.options = { avoid_features: ["steps"], profile_params: { weightings: { quiet: 1, green: 1 } } };
+  const f = await orsRoute(body);
+  return routeFromFeature(f, { straight: p.straight, wps: p.wps });
+}
+// Unas 12 consultas por ruta: 5 planeadas con el mapa de alturas + 4 al azar (vueltas) y 3 de ajuste.
+async function createTerrainRoutes() {
+  const L = S.km * 1000, A = [S.start.lng, S.start.lat], ow = oneWay(), B = ow ? [S.end.lng, S.end.lat] : A;
+  const c = { lat: (A[1] + B[1]) / 2, lng: (A[0] + B[0]) / 2 }, R = Math.min(9000, Math.max(700, ow ? L * .45 : L * .32));
+  const grid = await terrainGrid(c, R);
+  let factor = bike() ? 1.25 : 1.3;
+  const gen = (f, seed) => ow ? abCandidates(grid, A, B, L / f) : loopCandidates(grid, A, L / f, seed);
+  const calls = gen(factor, 0).slice(0, ow ? 8 : 5).map(fetchWps), b0 = S.seedBase;
+  if (!ow) (bike() ? [[b0 + 1, 4, .8], [b0 + 2, 5, .84], [b0 + 3, 4, .88], [b0 + 4, 5, .82]] : [[b0 + 1, 4, .72], [b0 + 2, 5, .76], [b0 + 3, 4, .8], [b0 + 4, 5, .72]]).forEach(([s0, p0, f0]) => calls.push(fetchLoop(s0, p0, f0)));
+  const rs = await Promise.allSettled(calls);
+  let out = rs.filter(x => x.status === "fulfilled").map(x => x.value);
+  if (!out.length) throw rs[0].reason;
+  // Segunda ronda: corrige cuánto se alargan las calles respecto a la línea recta y vuelve a intentar.
+  if (Math.max(...out.map(x => x.match)) < 88) {
+    const wr = out.filter(x => x.straight);
+    if (wr.length) factor = Math.min(1.8, Math.max(1.05, wr.reduce((a, x) => a + x.total / x.straight, 0) / wr.length));
+    out = out.concat((await Promise.allSettled(gen(factor, 97).slice(0, ow ? 4 : 3).map(fetchWps))).filter(x => x.status === "fulfilled").map(x => x.value));
+  }
+  return out;
+}
 async function createRoutes() {
   if (!S.start) { showMsg(t("needStart"), true); return; }
   if (S.endMode === "point" && !S.end) { showMsg(t("needEnd"), true); return; }
@@ -928,10 +1034,16 @@ async function createRoutes() {
   }
   if (!ok.length) {
     showMsg(note + t("findingRoutes"));
-    if (oneWay()) { try { ok = await createOneWay(); } catch (e) { results = [{ reason: e }]; } }
-    else {
-      results = await Promise.allSettled(tries.map(([s, p, f]) => fetchLoop(s, p, f)));
-      ok = results.filter(r => r.status === "fulfilled").map(r => r.value);
+    // Primero con el mapa de alturas; si el servicio de alturas falla, se hace como antes.
+    let terr = null;
+    try { ok = await createTerrainRoutes(); } catch (e) { terr = e; ok = []; }
+    if (!ok.length && terr && terr.status) results = [{ reason: terr }];
+    else if (!ok.length) {
+      if (oneWay()) { try { ok = await createOneWay(); } catch (e) { results = [{ reason: e }]; } }
+      else {
+        results = await Promise.allSettled(tries.map(([s, p, f]) => fetchLoop(s, p, f)));
+        ok = results.filter(r => r.status === "fulfilled").map(r => r.value);
+      }
     }
   }
   $("go").dataset.busy = ""; $("go").textContent = t("go"); renderSetup();
@@ -939,6 +1051,9 @@ async function createRoutes() {
   showMsg(note);
   S.challenge = null; $("challengeBox").hidden = true;
   S.routes = ok.sort((x, y) => y.rank - x.rank).slice(0, 3); S.opt = 0;
+  // Si la zona no tiene el terreno pedido, se dice claro y se muestra lo más parecido.
+  const top = S.routes[0];
+  if (top && !(top.sights && top.sights.length) && top.match < 75) showMsg(note + t("terrainLimit", top.real.plano, top.real.ondulado, top.real.subida, top.real.bajada));
   showResult(true);
   await loadSightInfo();
   store.set("rm_last", packRoute(S.routes[0], t("lastRoute")));
@@ -1233,10 +1348,10 @@ $("save").addEventListener("click", () => {
   showMsg(store.set("rm_saved", list.slice(0, 15)) ? t("savedOk") : t("saveFail"), false);
 });
 const hasMust = rt => (rt.sights || []).some(x => x.must);
-const canLink = rt => !!(rt.seed || (rt.sights && rt.sights.length) || (rt.wps && (oneWay() || hasMust(rt))));
+const canLink = rt => !!(rt.seed || (rt.sights && rt.sights.length) || rt.wps);
 function shareUrl(rt) {
   const base = location.origin + location.pathname, bk = bike() ? BIKE_TYPES.indexOf(S.bikeType) + 1 : 0;
-  if (rt.wps && (oneWay() || hasMust(rt))) return base + "#via=" + [S.wlang, bk, S.km, S.mix.plano, S.mix.ondulado, S.mix.subida, S.mix.bajada, S.quiet ? 1 : 0, rt.wps.length].concat(rt.wps.flatMap(q => [q[1].toFixed(5), q[0].toFixed(5)]), (rt.sights || []).filter(x => typeof x.id === "number").map(x => x.id)).join("_");
+  if (rt.wps && (oneWay() || hasMust(rt) || !(rt.sights && rt.sights.length))) return base + "#via=" + [S.wlang, bk, S.km, S.mix.plano, S.mix.ondulado, S.mix.subida, S.mix.bajada, S.quiet ? 1 : 0, rt.wps.length].concat(rt.wps.flatMap(q => [q[1].toFixed(5), q[0].toFixed(5)]), (rt.sights || []).filter(x => typeof x.id === "number").map(x => x.id)).join("_");
   if (rt.sights && rt.sights.length) return base + "#lugares=" + [S.wlang, bk, S.km, S.mix.plano, S.mix.ondulado, S.mix.subida, S.mix.bajada, S.start.lat.toFixed(5), S.start.lng.toFixed(5)].concat(rt.sights.map(s => s.id)).join("_");
   return base + "#ruta=" + [S.start.lat.toFixed(5), S.start.lng.toFixed(5), S.km, S.mix.plano, S.mix.ondulado, S.mix.subida, S.mix.bajada, S.quiet ? 1 : 0, rt.seed, rt.points, rt.factor, bk].join("_");
 }
@@ -1246,6 +1361,7 @@ async function shareLink(url, text) {
   showMsg((await copyText(text + " " + url)) ? t("linkCopied") : t("copyThis", esc(url)), false);
 }
 $("share").addEventListener("click", () => {
+  ping("share");
   const rt = S.routes[S.opt];
   if (!canLink(rt)) { showMsg(t("noLink"), true); return; }
   shareLink(shareUrl(rt), t("shareText", fmtKm(rt.total)));
@@ -1256,6 +1372,7 @@ async function shareFile(file, title) {
   return false;
 }
 $("gpx").addEventListener("click", async () => {
+  ping("gpx");
   const rt = S.routes[S.opt], name = "Ruta a Medida " + fmtKm(rt.total) + " km";
   const pts = rt.coords.map(c => '<trkpt lat="' + c[1] + '" lon="' + c[0] + '"><ele>' + Math.round(c[2] || 0) + '</ele></trkpt>').join("");
   const xml = '<?xml version="1.0" encoding="UTF-8"?><gpx version="1.1" creator="Ruta a Medida" xmlns="http://www.topografix.com/GPX/1/1"><metadata><name>' + name + '</name></metadata><trk><name>' + name + '</name><trkseg>' + pts + '</trkseg></trk></gpx>';
@@ -1335,6 +1452,7 @@ document.addEventListener("visibilitychange", () => { if (S.run && !S.run.paused
 function runElapsed() { const r = S.run; return r.acc + (r.paused ? 0 : (Date.now() - r.t0) / 1000); }
 
 $("start").addEventListener("click", () => {
+  ping("start");
   const rt = S.routes[S.opt];
   S.run = { rt, t0: Date.now(), acc: 0, paused: false, dist: 0, last: null, idx: 0, done: 0, off: false, cued: {}, kmSaid: 0, samples: [], sightSaid: {}, stepSaid: {}, ghostSaid: 0 };
   document.body.classList.add("running"); $("run").hidden = false;
